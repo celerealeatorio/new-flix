@@ -103,7 +103,10 @@
   .load-status.err { color: var(--red); }
   .load-status.ok { color: #46d369; }
 
-  .player-panel { margin-bottom: 16px; }
+  .player-panel {
+    position: sticky; top: calc(var(--topbar-h, 60px)); z-index: 30;
+    background: var(--bg); margin-bottom: 16px; padding-top: 4px;
+  }
   .player-bar {
     display: flex; align-items: center; gap: 10px; padding: 10px 2px; flex-wrap: wrap;
     border-bottom: 2px solid var(--red); margin-bottom: 10px;
@@ -228,17 +231,6 @@
   </div>
 
   <div class="container">
-    <div class="load-panel hidden" id="loadPanel">
-      <h2>Carregar lista de canais (M3U / M3U8) — admin</h2>
-      <div class="load-row">
-        <input type="text" id="playlistUrl" placeholder="URL da playlist (.m3u / .m3u8)">
-        <button class="btn primary" id="btnCarregarUrl">Carregar URL</button>
-        <button class="btn" id="btnAbrirArquivo">📁 Abrir arquivo</button>
-        <input type="file" id="arquivoPlaylist" accept=".m3u,.m3u8,text/plain" style="display:none">
-      </div>
-      <div class="load-status" id="loadStatus"></div>
-    </div>
-
     <div class="player-panel">
       <div class="player-bar">
         <span class="now" id="nowPlaying">Nenhum canal selecionado</span>
@@ -302,7 +294,7 @@
     });
   });
 
-  var LS = { favs: 'iptv:favoritos', rec: 'iptv:recentes' };
+  var LS = { favs: 'iptv:favoritos', rec: 'iptv:recentes', users: 'iptv:usuarios-locais' };
   var SESSAO = 'iptv:session';
   function lsGet(k, def) {
     try { return JSON.parse(localStorage.getItem(k)) || def; } catch (e) { return def; }
@@ -335,11 +327,6 @@
     t.classList.add('show');
     clearTimeout(t._h);
     t._h = setTimeout(function () { t.classList.remove('show'); }, 2600);
-  }
-  function status(msg, cls) {
-    var el = document.getElementById('loadStatus');
-    el.textContent = msg;
-    el.className = 'load-status' + (cls ? ' ' + cls : '');
   }
   function loginStatus(msg, cls) {
     var el = document.getElementById('loginStatus');
@@ -422,14 +409,44 @@
     timerInterval = setInterval(tick, 1000);
   }
 
+  function todasEntradas() {
+    var mapa = {};
+    lsGet(LS.users, []).forEach(function (e) { mapa[String(e.usuario).toLowerCase()] = e; });
+    (window.USUARIOS || []).forEach(function (e) { mapa[String(e.usuario).toLowerCase()] = e; });
+    return Object.keys(mapa).map(function (k) { return mapa[k]; });
+  }
+
+  function importarConvite() {
+    var m = location.hash.match(/[#&]u=([A-Za-z0-9_-]+)/);
+    if (!m) return;
+    try {
+      var bin = atob(m[1].replace(/-/g, '+').replace(/_/g, '/'));
+      var bytes = new Uint8Array(bin.length);
+      for (var i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i);
+      var entrada = JSON.parse(new TextDecoder().decode(bytes));
+      if (!entrada || !entrada.usuario || !entrada.dados || !entrada.salt || !entrada.iv) throw new Error('formato');
+      var locais = lsGet(LS.users, []).filter(function (e) {
+        return String(e.usuario).toLowerCase() !== String(entrada.usuario).toLowerCase();
+      });
+      locais.push(entrada);
+      lsSet(LS.users, locais);
+      document.getElementById('loginUsuario').value = entrada.usuario;
+      toast('✅ Usuário "' + entrada.usuario + '" adicionado neste aparelho. Entre com a sua chave.');
+    } catch (e) {
+      toast('⚠️ Link de convite inválido.');
+    }
+    history.replaceState(null, '', location.pathname + location.search);
+  }
+  importarConvite();
+
   function entrar(usuario, chave, salvarSessao) {
-    var lista = window.USUARIOS || [];
+    var lista = todasEntradas();
     var entrada = null;
     for (var i = 0; i < lista.length; i++) {
       if (String(lista[i].usuario).toLowerCase() === usuario.toLowerCase()) { entrada = lista[i]; break; }
     }
     if (!entrada) {
-      return Promise.reject(new Error('Usuário não encontrado.'));
+      return Promise.reject(new Error('Usuário não encontrado neste aparelho. Peça ao administrador o link de convite (🔗 no painel admin).'));
     }
     return IptvCrypto.descriptografar(entrada, chave).then(function (texto) {
       var dados = JSON.parse(texto);
@@ -459,8 +476,8 @@
         expiraEm = dados.expiraEm || null;
         document.getElementById('badgeUsuario').textContent = usuario;
         document.getElementById('badgeAdmin').textContent = dados.admin ? '· admin' : '';
-        document.getElementById('loadPanel').className = 'load-panel' + (dados.admin ? '' : ' hidden');
         document.getElementById('appRoot').className = '';
+        medirTopbar();
         document.getElementById('loginScreen').className = 'hidden';
         iniciarTimer();
         if (salvarSessao) {
@@ -674,41 +691,13 @@
     if (canal) tocar(canal);
   });
 
-  document.getElementById('btnCarregarUrl').addEventListener('click', function () {
-    var url = document.getElementById('playlistUrl').value.trim();
-    if (!url) { status('Informe a URL da playlist.', 'err'); return; }
-    status('⏳ Baixando lista...');
-    baixar(url).then(function (txt) {
-      var lista = parseM3U(txt);
-      if (!lista.length) throw new Error('nenhum canal encontrado');
-      lista.forEach(function (c) { c.grupo = 'Lista admin · ' + c.grupo; });
-      definirCanais(canais.concat(lista));
-      status('✅ ' + lista.length + ' canais carregados.', 'ok');
-    }).catch(function (e) {
-      status('❌ Falha: ' + e.message + '. Se for bloqueio de CORS, baixe o arquivo e use "Abrir arquivo".', 'err');
-    });
-  });
-  document.getElementById('playlistUrl').addEventListener('keydown', function (e) {
-    if (e.key === 'Enter') document.getElementById('btnCarregarUrl').click();
-  });
-
-  document.getElementById('btnAbrirArquivo').addEventListener('click', function () {
-    document.getElementById('arquivoPlaylist').click();
-  });
-  document.getElementById('arquivoPlaylist').addEventListener('change', function (e) {
-    var file = e.target.files[0];
-    if (!file) return;
-    var reader = new FileReader();
-    reader.onload = function () {
-      var lista = parseM3U(reader.result);
-      if (!lista.length) { status('❌ Nenhum canal encontrado no arquivo.', 'err'); return; }
-      lista.forEach(function (c) { c.grupo = 'Arquivo · ' + c.grupo; });
-      definirCanais(canais.concat(lista));
-      status('✅ ' + lista.length + ' canais do arquivo ' + file.name + '.', 'ok');
-    };
-    reader.readAsText(file);
-    e.target.value = '';
-  });
+  var topbar = document.querySelector('.topbar');
+  function medirTopbar() {
+    if (!topbar) return;
+    document.documentElement.style.setProperty('--topbar-h', topbar.offsetHeight + 'px');
+  }
+  window.addEventListener('resize', medirTopbar);
+  if ('ResizeObserver' in window) new ResizeObserver(medirTopbar).observe(topbar);
 
   document.getElementById('busca').addEventListener('input', renderGrid);
   document.getElementById('filtroGrupo').addEventListener('change', renderGrid);

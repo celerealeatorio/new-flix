@@ -182,23 +182,39 @@
   </div>
 
   <div class="panel">
-    <h2>3. Usuários criados (nesta sessão)</h2>
+    <h2>3. Usuários (sincronizados com o GitHub)</h2>
     <div id="listaUsuarios"></div>
+    <div class="note">
+      🔗 = copiar o <b>link de convite</b> — envie para a pessoa (WhatsApp, por exemplo); ela abre o link,
+      o usuário é instalado no app dela e entra com a chave, sem editar nada no GitHub.
+      🗑️ = <b>remover e revogar</b> — exclui o usuário e publica a exclusão no GitHub automaticamente.
+    </div>
   </div>
 
   <div class="panel">
-    <h2>4. Publicar — arquivo usuarios.js</h2>
-    <textarea id="saida" spellcheck="false" placeholder="O conteúdo de usuarios.js aparece aqui após gerar usuários..."></textarea>
+    <h2>4. Publicação automática no GitHub</h2>
+    <div class="btn-row" style="margin-top:6px">
+      <input type="password" id="ghToken" placeholder="Token do GitHub (salvo apenas neste navegador)" style="flex:1;min-width:220px">
+      <button class="btn primary" id="btnSalvarToken">Salvar token</button>
+      <button class="btn" id="btnPublicarAgora">🚀 Publicar agora</button>
+      <button class="btn" id="btnAbrirGitHub">🐙 Abrir usuarios.js no GitHub</button>
+    </div>
+    <div class="status" id="pubStatus"></div>
+    <div class="note">
+      <b>Configuração (apenas uma vez):</b> abra <b>github.com/settings/personal-access-tokens/new</b>,
+      em "Repository access" marque <b>Only selected repositories</b> e escolha <b>celerealeatorio/new-flix</b>;
+      em "Permissions" → <b>Contents</b> → <b>Read and write</b>; clique em Generate e cole o token acima.
+      Pronto: cada usuário gerado na seção 2 é <b>publicado sozinho no GitHub</b> — nada de copiar e colar.
+      <b>Manual (alternativa):</b> use 🐙 para abrir o usuarios.js no GitHub e cole o conteúdo abaixo.
+    </div>
+    <textarea id="saida" spellcheck="false" placeholder="Conteúdo de usuarios.js (usado apenas na publicação manual)..."></textarea>
     <div class="btn-row">
       <button class="btn" id="btnCopiar">📋 Copiar</button>
       <button class="btn" id="btnBaixar">⬇️ Baixar usuarios.js</button>
     </div>
     <div class="note">
-      <b>Como publicar:</b> copie o conteúdo, abra o arquivo <b>usuarios.js</b> no GitHub
-      (botão ✏️ de editar), substitua tudo, cole e faça o commit. Os usuários entram no app
-      com o login e a chave. <b>Tempo de acesso:</b> começa a contar no momento da geração;
-      ao expirar, o app bloqueia automaticamente (mesmo assistindo). Para renovar, gere o
-      usuário novamente com a mesma chave. <b>Revogar:</b> remova o usuário na seção 3 e publique.
+      <b>Tempo de acesso:</b> começa a contar no momento da geração; ao expirar, o app bloqueia
+      automaticamente (mesmo assistindo). Para renovar, gere o usuário novamente com a mesma chave.
     </div>
   </div>
 </div>
@@ -219,6 +235,63 @@
   var catalogo = lsGet(LS_CAT, []);
   var entradas = lsGet(LS_ENT, []);
   var selecao = {};
+
+  var GH = { repo: 'celerealeatorio/new-flix', path: 'usuarios.js', tokenKey: 'iptv:gh-token' };
+
+  function ghToken() { return localStorage.getItem(GH.tokenKey) || ''; }
+
+  function b64utf8(s) {
+    var bytes = new TextEncoder().encode(s);
+    var bin = '';
+    for (var i = 0; i < bytes.length; i++) bin += String.fromCharCode(bytes[i]);
+    return btoa(bin);
+  }
+
+  function b64url(s) {
+    return b64utf8(s).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+  }
+
+  function linkConvite(entrada) {
+    var base = location.origin + location.pathname.replace('admin.html', 'index.html');
+    return base + '#u=' + b64url(JSON.stringify(entrada));
+  }
+
+  function pubStatus(msg, cls) {
+    var st = document.getElementById('pubStatus');
+    st.textContent = msg;
+    st.className = 'status' + (cls ? ' ' + cls : '');
+  }
+
+  function publicar(mensagem) {
+    if (!ghToken()) {
+      pubStatus('⚠️ Token do GitHub não salvo — salve o token acima ou publique manualmente (🐙 + colar).', 'err');
+      return Promise.reject(new Error('sem token'));
+    }
+    pubStatus('⏳ Publicando no GitHub...', '');
+    var conteudo = entradas.length
+      ? 'window.USUARIOS = ' + JSON.stringify(entradas, null, 2) + ';\n'
+      : 'window.USUARIOS = [];\n';
+    return fetch('https://api.github.com/repos/' + GH.repo + '/contents/' + GH.path, {
+      headers: { 'Authorization': 'Bearer ' + ghToken(), 'Accept': 'application/vnd.github+json' }
+    }).then(function (r) {
+      if (!r.ok) throw new Error('GitHub ' + r.status + ' ao ler usuarios.js — token válido? Permissão Contents: Read and write?');
+      return r.json();
+    }).then(function (arq) {
+      return fetch('https://api.github.com/repos/' + GH.repo + '/contents/' + GH.path, {
+        method: 'PUT',
+        headers: { 'Authorization': 'Bearer ' + ghToken(), 'Accept': 'application/vnd.github+json', 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          message: mensagem || 'Atualizar usuarios.js (painel admin)',
+          content: b64utf8(conteudo),
+          sha: arq.sha
+        })
+      });
+    }).then(function (r) {
+      if (!r.ok) return r.json().then(function (j) { throw new Error('GitHub ' + r.status + (j && j.message ? ': ' + j.message : '')); });
+      pubStatus('✅ Publicado no GitHub! Os usuários já podem entrar (o site atualiza em ~1 minuto).', 'ok');
+      atualizarSaida();
+    });
+  }
 
   function esc(s) {
     return String(s).replace(/[&<>"']/g, function (c) {
@@ -514,8 +587,13 @@
       entradas.sort(function (a, b) { return a.usuario.localeCompare(b.usuario); });
       salvarEntradas();
       var tempo = tipo === 'minutos' ? minutos + ' minuto(s)' : 'ilimitado';
-      st.textContent = '✅ Usuário "' + usuario + '" gerado — ' + canaisSel.length + ' canal(is), acesso ' + tempo + '. Publique o usuarios.js (seção 4).';
+      st.textContent = '✅ Usuário "' + usuario + '" gerado — ' + canaisSel.length + ' canal(is), acesso ' + tempo + '.';
       st.className = 'status ok';
+      if (ghToken()) {
+        publicar('Usuário ' + usuario + ' (painel admin)').catch(function () {});
+      } else {
+        pubStatus('⚠️ Usuário criado localmente. Salve o token para publicar automaticamente, ou use 🐙 + colar.', 'err');
+      }
     }).catch(function (e) {
       st.textContent = '❌ Erro: ' + e.message;
       st.className = 'status err';
@@ -530,16 +608,34 @@
     }
     box.innerHTML = entradas.map(function (e) {
       return '<span class="user-chip">👤 <b>' + esc(e.usuario) + '</b>' +
-        '<button class="rmuser" data-u="' + esc(e.usuario) + '" title="Remover">✕</button></span>';
+        '<button class="lkuser" data-u="' + esc(e.usuario) + '" title="Copiar link de convite">🔗</button>' +
+        '<button class="rmuser" data-u="' + esc(e.usuario) + '" title="Remover e revogar acesso">🗑️</button></span>';
     }).join('');
   }
 
   document.getElementById('listaUsuarios').addEventListener('click', function (e) {
-    if (!e.target.classList.contains('rmuser')) return;
-    var u = e.target.getAttribute('data-u');
-    if (confirm('Remover o usuário "' + u + '" da saída? (Depois publique o usuarios.js para revogar o acesso.)')) {
+    var alvo = e.target;
+    var u = alvo.getAttribute('data-u');
+    if (!u) return;
+    if (alvo.classList.contains('lkuser')) {
+      var entrada = null;
+      entradas.forEach(function (e2) { if (e2.usuario === u) entrada = e2; });
+      if (!entrada) return;
+      var link = linkConvite(entrada);
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(link).then(function () {
+          pubStatus('🔗 Link de convite de "' + u + '" copiado! Envie para a pessoa junto com a chave.', 'ok');
+        }).catch(function () { prompt('Copie o link de convite:', link); });
+      } else {
+        prompt('Copie o link de convite:', link);
+      }
+      return;
+    }
+    if (!alvo.classList.contains('rmuser')) return;
+    if (confirm('Remover o usuário "' + u + '" e revogar o acesso? (Publica a exclusão no GitHub automaticamente.)')) {
       entradas = entradas.filter(function (e2) { return e2.usuario !== u; });
       salvarEntradas();
+      publicar('Remover usuário ' + u + ' (painel admin)').catch(function () {});
     }
   });
 
@@ -571,6 +667,27 @@
     a.click();
     document.body.removeChild(a);
   });
+
+  document.getElementById('btnSalvarToken').addEventListener('click', function () {
+    var v = document.getElementById('ghToken').value.trim();
+    if (v) {
+      localStorage.setItem(GH.tokenKey, v);
+      document.getElementById('ghToken').value = '';
+    }
+    pubStatus(ghToken()
+      ? '✅ Token salvo neste navegador. Ao gerar um usuário, a publicação no GitHub é automática.'
+      : '⚠️ Nenhum token informado — veja as instruções acima.', ghToken() ? 'ok' : 'err');
+  });
+
+  document.getElementById('btnPublicarAgora').addEventListener('click', function () {
+    publicar('Atualizar usuarios.js (painel admin)').catch(function () {});
+  });
+
+  document.getElementById('btnAbrirGitHub').addEventListener('click', function () {
+    window.open('https://github.com/' + GH.repo + '/edit/main/' + GH.path, '_blank');
+  });
+
+  if (ghToken()) pubStatus('✅ Token salvo neste navegador — publicação automática ativa.', 'ok');
 
   fetch('usuarios.js').then(function (r) { return r.text(); }).then(function (txt) {
     var m = txt.match(/window\.USUARIOS\s*=\s*(\[[\s\S]*?\]);?\s*$/);
