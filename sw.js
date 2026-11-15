@@ -1,4 +1,4 @@
-var CACHE_NAME = 'newflix-v4';
+var CACHE_NAME = 'newflix-v5';
 var ARQUIVOS = [
   './',
   './index.html',
@@ -6,6 +6,7 @@ var ARQUIVOS = [
   './filmes.html',
   './manifest.webmanifest',
   './crypto.js',
+  './oficiais.js',
   './vendor/hls.min.js',
   './icons/icon-192.png',
   './icons/icon-512.png'

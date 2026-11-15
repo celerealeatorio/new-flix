@@ -204,6 +204,7 @@
 </div>
 
 <script src="crypto.js"></script>
+<script src="oficiais.js"></script>
 <script>
 (function () {
   'use strict';
@@ -292,14 +293,22 @@
     }).join('');
   }
 
+  function todosCanais() {
+    var oficiais = (window.CANAIS_OFICIAIS || []).map(function (c) {
+      return { nome: c.nome, logo: c.logo, grupo: '⭐ Oficial do app', url: c.url };
+    });
+    return oficiais.concat(catalogo);
+  }
+
   function renderPick() {
     var box = document.getElementById('pickList');
     var busca = document.getElementById('pickBusca').value.toLowerCase().trim();
-    var filtrados = catalogo.filter(function (c) {
+    var todos = todosCanais();
+    var filtrados = todos.filter(function (c) {
       return !busca || c.nome.toLowerCase().indexOf(busca) !== -1;
     });
-    if (!catalogo.length) {
-      box.innerHTML = '<div class="pick-item" style="color:var(--muted)">Importe canais no catálogo (seção 1) primeiro.</div>';
+    if (!todos.length) {
+      box.innerHTML = '<div class="pick-item" style="color:var(--muted)">Nenhum canal disponível.</div>';
       return;
     }
     if (!filtrados.length) {
@@ -463,7 +472,7 @@
 
   document.getElementById('btnSelTodos').addEventListener('click', function () {
     var busca = document.getElementById('pickBusca').value.toLowerCase().trim();
-    catalogo.forEach(function (c) {
+    todosCanais().forEach(function (c) {
       if (!busca || c.nome.toLowerCase().indexOf(busca) !== -1) selecao[c.url] = true;
     });
     renderPick();
@@ -488,7 +497,7 @@
     if (!usuario || !chave) { st.textContent = '❌ Informe usuário e chave.'; st.className = 'status err'; return; }
     if (tipo === 'minutos' && (!minutos || minutos < 1)) { st.textContent = '❌ Informe os minutos de acesso.'; st.className = 'status err'; return; }
 
-    var canaisSel = catalogo.filter(function (c) { return selecao[c.url]; });
+    var canaisSel = todosCanais().filter(function (c) { return selecao[c.url]; });
     if (!admin && !canaisSel.length) { st.textContent = '❌ Selecione ao menos um canal para o usuário.'; st.className = 'status err'; return; }
 
     var payload = {
@@ -562,6 +571,18 @@
     a.click();
     document.body.removeChild(a);
   });
+
+  fetch('usuarios.js').then(function (r) { return r.text(); }).then(function (txt) {
+    var m = txt.match(/window\.USUARIOS\s*=\s*(\[[\s\S]*?\]);?\s*$/);
+    if (!m) return;
+    var publicados = JSON.parse(m[1]);
+    var locais = {};
+    entradas.forEach(function (e) { locais[e.usuario.toLowerCase()] = true; });
+    publicados.forEach(function (e) {
+      if (!locais[e.usuario.toLowerCase()]) entradas.push(e);
+    });
+    salvarEntradas();
+  }).catch(function () {});
 
   salvarCatalogo();
   salvarEntradas();

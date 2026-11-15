@@ -1,8 +1,8 @@
 window.USUARIOS = [
   {
     "usuario": "admin",
-    "salt": "vpAYu3MqjfuuqVSAm7ZT2Q==",
-    "iv": "RS73/5qvEaOLLsSp",
-    "dados": "6GHhWs6vIsNO7aJZDGJyTbioxx/8ieBQRW9ck1VJSqQjdSutLceAA868B05g0l7d3sVw+d+p9tMhm7rhCGbYAtY10TqfR4VnCs3ZZsIPzdJdIOkd4vs7k2TS5J3yhh2eHCnth7MN0yRqzQYN3z+LBlZ5zzs/7/P5ChWszNfBH6ThtqWso8K5/L51Hi0+NrgHiWfG"
+    "salt": "mH0C57hf6ech1FY1A/YH1A==",
+    "iv": "OQwNlYQyIAy5uW4z",
+    "dados": "C0oZtaRBuqdQaT/ba73HTaJTN+afOa5I8OVsVjjnoRY4mgTTlmK4kQNiVLDVaItH+v/jcwABy9daxskn/++adOUv3d1Wf7cmNbSGWmDNEAdyS23daamB7xdlVqoJ9GAyw1nkRz9PwqTg5Lpb9fzTUUECi4siMOVSH0ucu6YxplfGPXDUPiSZbCOi3r9tXJ9FxPb0Mej4zecDszDO2/wwuEQ1UNFYvmX20kalTpc5XGZSg3X0sWbGC2CUcI1modjHQGrHbGi6iSMBhmLsh9YZSBy80HRU18fiKl3cPF1u5XNND6kYbOF8f6EHfz+guzW1cv7zYff8flWl+59vvw4d4wuWc+lcAQT4LZNrXU1V6l5mbW4WiJyv5GeWKO1cofgBG5/cybYpuv8hkLwTpSidWhg/RPHQObi8/8W0lLE3so6OUaY2vo4LQ0PoG6z6vYIUCcqS8eoCKwUbbFgD1Fx8pzuS1DE3repchNoGs8Cjfx415e3hshWVo7Az6H931bUvM1FLwSNNng88jxJvHLfjpP/8Fb5Q17daQ/CkvzYvHdiAspPH6U3AG8wTWFXm2DQabIKVXasU2MTqeDzJX8+CzEmeZBc9c42pPEichrahy7L0XxhiZ+3FJ6DlhJ9mOVOwVd+hJBzA14d5m+qJulVMUv2PWqn1eo5/ULPWCU2woUWVlbOGPjK/zVjJfMygA+L2TUJAXP2e3xD8fw=="
   }
 ];

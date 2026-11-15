@@ -275,6 +275,7 @@
 <div class="toast" id="toast"></div>
 
 <script src="crypto.js"></script>
+<script src="oficiais.js"></script>
 <script src="usuarios.js"></script>
 <script src="vendor/hls.min.js"></script>
 <script>
@@ -300,13 +301,6 @@
       installBtn.style.display = 'none';
     });
   });
-
-  var CANAIS_OFICIAIS = [
-    { nome: 'SBT (oficial HD)', logo: '', grupo: 'Oficiais', url: 'yt:UCR3TOnFWDeAlT-Ho6LueDmg' },
-    { nome: 'Record News (oficial HD)', logo: '', grupo: 'Oficiais', url: 'yt:UCuiLR4p6wQ3xLEm15pEn1Xw' },
-    { nome: 'Band Ao Vivo (oficial HD)', logo: '', grupo: 'Oficiais', url: 'yt:UCilfEXKqavPruqCGdwDBlAQ' },
-    { nome: 'TV Brasil (oficial)', logo: '', grupo: 'Oficiais', url: 'yt:UCSv9d0kQegylHWpP83jWSQg' }
-  ];
 
   var LS = { favs: 'iptv:favoritos', rec: 'iptv:recentes' };
   var SESSAO = 'iptv:session';
@@ -442,8 +436,7 @@
       if (dados.expiraEm && Date.now() > dados.expiraEm) {
         throw new Error('EXPIRADO');
       }
-      var base = CANAIS_OFICIAIS.slice();
-      (dados.canais || []).forEach(function (c) { base.push(c); });
+      var base = (dados.canais || []).slice();
       var promessaListas = Promise.resolve();
       if (dados.admin && dados.playlists && dados.playlists.length) {
         promessaListas = Promise.all(dados.playlists.map(function (p) {
@@ -491,8 +484,12 @@
         loginStatus('⛔ Seu acesso expirou. Fale com o administrador.', 'err');
       } else if (err.message === 'SEM_CANAIS') {
         loginStatus('⛔ Nenhum canal liberado para este usuário.', 'err');
+      } else if (err.name === 'OperationError') {
+        loginStatus('❌ Chave incorreta para o usuário "' + usuario + '".', 'err');
+      } else if (err instanceof SyntaxError) {
+        loginStatus('❌ Dados do usuário corrompidos. Avise o administrador.', 'err');
       } else {
-        loginStatus('❌ Usuário ou chave incorretos.', 'err');
+        loginStatus('❌ ' + err.message, 'err');
       }
     }).then(function () { btn.disabled = false; });
   });
