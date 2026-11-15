@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>NEWFLIX — Filmes</title>
+<meta name="theme-color" content="#0a0a0a">
+<link rel="icon" href="icons/icon-192.png">
+<meta name="mobile-web-app-capable" content="yes">
+<style>
+  :root {
+    --bg: #0a0a0a; --panel: #141414; --panel-2: #1f1f1f; --border: #2a2a2a;
+    --text: #fff; --muted: #b3b3b3; --red: #e50914; --red-dark: #b20710;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'Segoe UI', system-ui, sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
+  .topbar { background: rgba(10,10,10,.95); border-bottom: 2px solid var(--red); position: sticky; top: 0; z-index: 40; }
+  .topbar-inner { max-width: 1400px; margin: 0 auto; padding: 12px 16px; display: flex; justify-content: space-between; align-items: center; gap: 10px; flex-wrap: wrap; }
+  .logo { font-size: 1.25rem; font-weight: 900; letter-spacing: 4px; color: var(--red); text-transform: uppercase; }
+  .header-right { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+  .btn {
+    padding: 10px 16px; border-radius: 6px; border: 1px solid var(--border);
+    background: var(--panel-2); color: var(--text); font-size: 0.88rem; font-weight: 600; cursor: pointer;
+  }
+  .btn:hover { border-color: var(--red); color: var(--red); }
+  .btn.primary { background: var(--red); border-color: var(--red); color: #fff; }
+  .btn.primary:hover { background: var(--red-dark); color: #fff; }
+  .container { max-width: 1400px; margin: 0 auto; padding: 18px 16px 60px; }
+  .section-title { font-size: 1.05rem; font-weight: 700; margin: 22px 0 4px; }
+  .section-sub { font-size: 0.8rem; color: var(--muted); margin-bottom: 14px; }
+  .plat-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 14px; }
+  .plat {
+    background: var(--panel); border: 1px solid var(--border); border-left: 3px solid var(--red);
+    border-radius: 8px; padding: 18px; cursor: pointer; transition: transform .15s, border-color .15s;
+  }
+  .plat:hover { transform: scale(1.03); border-color: var(--red); }
+  .plat h3 { font-size: 1rem; margin-bottom: 6px; }
+  .plat p { font-size: 0.78rem; color: var(--muted); line-height: 1.5; }
+  .chips { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 16px; }
+  .chip {
+    padding: 9px 16px; border-radius: 20px; border: 1px solid var(--border);
+    background: var(--panel); color: var(--muted); font-size: 0.82rem; cursor: pointer;
+  }
+  .chip.active, .chip:hover { color: #fff; border-color: var(--red); background: rgba(229,9,20,.15); }
+  .movie-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 14px; }
+  .movie {
+    background: var(--panel); border: 1px solid var(--border); border-radius: 8px; overflow: hidden;
+    cursor: pointer; transition: transform .15s, border-color .15s, box-shadow .15s;
+  }
+  .movie:hover { transform: scale(1.04); border-color: var(--red); box-shadow: 0 8px 24px rgba(229,9,20,.25); z-index: 2; }
+  .movie .cover { aspect-ratio: 2 / 3; background: linear-gradient(135deg, #1a1a1a, #101010); display: flex; align-items: center; justify-content: center; }
+  .movie .cover img { width: 100%; height: 100%; object-fit: cover; }
+  .movie .txt { padding: 9px 10px 11px; border-top: 2px solid var(--red); }
+  .movie .txt .name { font-size: 0.8rem; font-weight: 700; line-height: 1.25; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+  .movie .txt .year { font-size: 0.7rem; color: var(--muted); margin-top: 3px; }
+  .status { text-align: center; color: var(--muted); padding: 40px 10px; font-size: 0.9rem; grid-column: 1 / -1; }
+  .modal {
+    position: fixed; inset: 0; background: rgba(0,0,0,.92); z-index: 80;
+    display: none; align-items: center; justify-content: center; padding: 16px; flex-direction: column; gap: 12px;
+  }
+  .modal.open { display: flex; }
+  .modal iframe { width: 100%; max-width: 960px; aspect-ratio: 16 / 9; border: 0; border-radius: 8px; background: #000; }
+  .modal .m-title { font-weight: 700; font-size: 1rem; }
+  footer { margin-top: 30px; font-size: 0.75rem; color: #555; text-align: center; line-height: 1.7; padding: 0 16px; }
+  @media (max-width: 700px) {
+    .movie-grid { grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)); gap: 10px; }
+    .container { padding: 12px 10px 50px; }
+  }
+</style>
+</head>
+<body>
+<div class="topbar">
+  <div class="topbar-inner">
+    <div class="logo">Newflix Filmes</div>
+    <div class="header-right">
+      <input type="text" id="busca" placeholder="🔍 Buscar filme..." style="padding:10px 12px;background:var(--panel-2);border:1px solid var(--border);border-radius:6px;color:var(--text);font-size:14px;outline:none;flex:1;min-width:150px">
+      <button class="btn" onclick="window.location.href='index.html'">📺 Canais</button>
+    </div>
+  </div>
+</div>
+
+<div class="container">
+  <div class="section-title">Plataformas legais e gratuitas (com anúncios)</div>
+  <div class="section-sub">Filmes atualizados, 100% legais e grátis — abrem em nova aba/app:</div>
+  <div class="plat-grid">
+    <div class="plat" data-url="https://pluto.tv/br">
+      <h3>🪐 Pluto TV</h3>
+      <p>Grátis e legal (Paramount). Filmes, séries e canais ao vivo no Brasil, com anúncios.</p>
+    </div>
+    <div class="plat" data-url="https://tubitv.com">
+      <h3>🎬 Tubi</h3>
+      <p>Grande catálogo gratuito de filmes com anúncios (Fox/Paramount). Verifique disponibilidade na sua região.</p>
+    </div>
+    <div class="plat" data-url="https://www.youtube.com/movies">
+      <h3>▶️ YouTube Filmes</h3>
+      <p>Seção "Grátis com anúncios" do YouTube, com filmes completos e legais.</p>
+    </div>
+  </div>
+
+  <div class="section-title">Clássicos gratuitos — domínio público (Internet Archive)</div>
+  <div class="section-sub">Assista aqui mesmo, via nuvem: filmes clássicos em domínio público, 100% legais.</div>
+  <div class="chips" id="chips">
+    <button class="chip active" data-q="collection:(feature_films)">🎬 Clássicos</button>
+    <button class="chip" data-q="collection:(film_noir)">🕵️ Film Noir</button>
+    <button class="chip" data-q="collection:(scifi_horrOR)">👽 Ficção & Terror</button>
+    <button class="chip" data-q="collection:(comedy_films)">😂 Comédia</button>
+    <button class="chip" data-q="collection:(westerns)">🤠 Faroeste</button>
+    <button class="chip" data-q="collection:(animationandcartoons)">🐭 Desenhos</button>
+  </div>
+  <div class="movie-grid" id="movieGrid">
+    <div class="status">⏳ Carregando filmes...</div>
+  </div>
+</div>
+
+<div class="modal" id="modal">
+  <iframe id="playerFrame" allow="autoplay; fullscreen" allowfullscreen></iframe>
+  <div class="m-title" id="mTitle"></div>
+  <button class="btn" id="btnFechar">✕ Fechar</button>
+</div>
+
+<footer>
+  Filmes recentes de estúdio gratuitos só existem em plataformas legais com anúncios (Pluto TV, Tubi, YouTube).
+  Filmes em domínio público podem ser distribuídos livremente. Não hospedamos nem indexamos conteúdo pirata.
+</footer>
+
+<script>
+(function () {
+  'use strict';
+
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('sw.js').catch(function () {});
+  }
+
+  var colecaoAtual = 'collection:(feature_films)';
+  var buscaAtual = '';
+  var pagina = 1;
+
+  function esc(s) {
+    return String(s).replace(/[&<>"']/g, function (c) {
+      return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
+    });
+  }
+
+  function carregar() {
+    var grid = document.getElementById('movieGrid');
+    grid.innerHTML = '<div class="status">⏳ Carregando filmes...</div>';
+    var q = colecaoAtual + ' AND mediatype:(movies)';
+    if (buscaAtual) q += ' AND title:(' + buscaAtual.replace(/[":()]/g, ' ') + ')';
+    var url = 'https://archive.org/advancedsearch.php?q=' + encodeURIComponent(q) +
+      '&fl%5B%5D=identifier&fl%5B%5D=title&fl%5B%5D=year&rows=48&page=' + pagina +
+      '&sort%5B%5D=downloads+desc&output=json';
+
+    fetch(url).then(function (r) { return r.json(); }).then(function (data) {
+      var docs = (data.response && data.response.docs) || [];
+      if (!docs.length) {
+        grid.innerHTML = '<div class="status">Nenhum filme encontrado.</div>';
+        return;
+      }
+      grid.innerHTML = docs.map(function (d) {
+        return '<div class="movie" data-id="' + esc(d.identifier) + '" data-title="' + esc(d.title || 'Filme') + '">' +
+          '<div class="cover"><img src="https://archive.org/services/img/' + esc(d.identifier) + '" alt="" loading="lazy"></div>' +
+          '<div class="txt"><div class="name">' + esc(d.title || 'Filme') + '</div>' +
+          '<div class="year">' + esc(d.year || '') + '</div></div></div>';
+      }).join('');
+    }).catch(function () {
+      grid.innerHTML = '<div class="status">❌ Falha ao carregar. Verifique sua conexão.</div>';
+    });
+  }
+
+  document.getElementById('chips').addEventListener('click', function (e) {
+    var chip = e.target.closest('.chip');
+    if (!chip) return;
+    Array.prototype.forEach.call(document.querySelectorAll('.chip'), function (c) { c.className = 'chip'; });
+    chip.className = 'chip active';
+    colecaoAtual = chip.getAttribute('data-q');
+    pagina = 1;
+    carregar();
+  });
+
+  var buscaTimer = null;
+  document.getElementById('busca').addEventListener('input', function () {
+    clearTimeout(buscaTimer);
+    var v = this.value.trim();
+    buscaTimer = setTimeout(function () {
+      buscaAtual = v;
+      pagina = 1;
+      carregar();
+    }, 500);
+  });
+
+  document.getElementById('movieGrid').addEventListener('click', function (e) {
+    var card = e.target.closest('.movie');
+    if (!card) return;
+    var id = card.getAttribute('data-id');
+    document.getElementById('playerFrame').src = 'https://archive.org/embed/' + id;
+    document.getElementById('mTitle').textContent = card.getAttribute('data-title');
+    document.getElementById('modal').className = 'modal open';
+  });
+
+  document.getElementById('btnFechar').addEventListener('click', function () {
+    document.getElementById('modal').className = 'modal';
+    document.getElementById('playerFrame').src = '';
+  });
+  document.getElementById('modal').addEventListener('click', function (e) {
+    if (e.target === this) {
+      this.className = 'modal';
+      document.getElementById('playerFrame').src = '';
+    }
+  });
+
+  Array.prototype.forEach.call(document.querySelectorAll('.plat'), function (p) {
+    p.addEventListener('click', function () {
+      window.open(p.getAttribute('data-url'), '_blank', 'noopener');
+    });
+  });
+
+  carregar();
+})();
+</script>
+</body>
+</html>

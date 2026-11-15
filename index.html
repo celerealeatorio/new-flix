@@ -76,12 +76,12 @@
   .badge.timer { color: var(--text); border-color: var(--red); }
   .badge.timer.warn { color: var(--red); font-weight: 700; }
 
-  .container { max-width: 1400px; margin: 0 auto; padding: 18px 16px 60px; }
+  .container { max-width: 1400px; margin: 0 auto; padding: 14px 16px 60px; }
   #appRoot.hidden, .hidden { display: none; }
 
   .load-panel {
     background: var(--panel); border: 1px solid var(--border); border-left: 3px solid var(--red);
-    border-radius: 8px; padding: 16px; margin-bottom: 18px;
+    border-radius: 8px; padding: 16px; margin-bottom: 14px;
   }
   .load-panel h2 { font-size: 0.95rem; margin-bottom: 12px; }
   .load-row { display: flex; gap: 8px; flex-wrap: wrap; }
@@ -102,6 +102,30 @@
   .load-status { font-size: 0.8rem; color: var(--muted); margin-top: 10px; min-height: 1em; }
   .load-status.err { color: var(--red); }
   .load-status.ok { color: #46d369; }
+
+  .player-panel { margin-bottom: 16px; }
+  .player-bar {
+    display: flex; align-items: center; gap: 10px; padding: 10px 2px; flex-wrap: wrap;
+    border-bottom: 2px solid var(--red); margin-bottom: 10px;
+  }
+  .player-bar .now { flex: 1; min-width: 120px; font-weight: 700; font-size: 1.05rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .player-bar .status { font-size: 0.75rem; color: var(--muted); }
+  .player-bar .status.err { color: var(--red); }
+  .btn-icon {
+    background: var(--panel-2); border: 1px solid var(--border); color: var(--text);
+    border-radius: 6px; padding: 10px 14px; cursor: pointer; font-size: 0.88rem;
+  }
+  .btn-icon:hover { border-color: var(--red); color: var(--red); }
+  .video-wrap {
+    position: relative; background: #000; border-radius: 8px; overflow: hidden;
+    aspect-ratio: 16 / 9; display: flex; align-items: center; justify-content: center;
+    border: 1px solid var(--border); max-height: 70vh;
+  }
+  .video-wrap video { width: 100%; height: 100%; background: #000; }
+  .video-wrap .placeholder { color: var(--muted); font-size: 0.95rem; text-align: center; padding: 20px; }
+  #ytFrame {
+    position: absolute; inset: 0; width: 100%; height: 100%; border: 0; display: none;
+  }
 
   .controls-row { display: flex; gap: 10px; margin-bottom: 16px; flex-wrap: wrap; align-items: center; }
   .tabs { display: flex; gap: 6px; }
@@ -149,27 +173,6 @@
   .ch-card .fav.on { color: var(--red); }
   .empty-list { text-align: center; color: var(--muted); padding: 60px 16px; font-size: 0.95rem; grid-column: 1 / -1; }
 
-  .player-panel { margin-top: 22px; }
-  .video-wrap {
-    position: relative; background: #000; border-radius: 8px; overflow: hidden;
-    aspect-ratio: 16 / 9; display: flex; align-items: center; justify-content: center;
-    border: 1px solid var(--border); max-height: 72vh;
-  }
-  .video-wrap video { width: 100%; height: 100%; background: #000; }
-  .video-wrap .placeholder { color: var(--muted); font-size: 0.95rem; text-align: center; padding: 20px; }
-  .player-bar {
-    display: flex; align-items: center; gap: 10px; padding: 12px 2px; flex-wrap: wrap;
-    border-bottom: 2px solid var(--red); margin-bottom: 4px;
-  }
-  .player-bar .now { flex: 1; min-width: 120px; font-weight: 700; font-size: 1rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-  .player-bar .status { font-size: 0.75rem; color: var(--muted); }
-  .player-bar .status.err { color: var(--red); }
-  .btn-icon {
-    background: var(--panel-2); border: 1px solid var(--border); color: var(--text);
-    border-radius: 6px; padding: 9px 13px; cursor: pointer; font-size: 0.88rem;
-  }
-  .btn-icon:hover { border-color: var(--red); color: var(--red); }
-
   .toast {
     position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%);
     background: var(--panel-2); border: 1px solid var(--red); color: var(--text);
@@ -179,6 +182,18 @@
   .toast.show { opacity: 1; }
   #installBtn { display: none; }
   footer { margin-top: 30px; font-size: 0.75rem; color: #555; text-align: center; line-height: 1.6; }
+
+  @media (max-width: 700px) {
+    .container { padding: 10px 10px 50px; }
+    .ch-grid { grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 10px; }
+    .ch-card .txt .name { font-size: 0.8rem; }
+    .topbar-inner { padding: 10px 10px; }
+    .btn, .btn-icon { padding: 12px 14px; font-size: 0.9rem; }
+    .tabs button { padding: 11px 12px; }
+    .controls-row input[type=text] { min-width: 100%; order: 10; }
+    .video-wrap { max-height: none; border-radius: 0; border-left: 0; border-right: 0; }
+    .player-bar .now { font-size: 0.95rem; }
+  }
 </style>
 </head>
 <body>
@@ -205,6 +220,7 @@
       <div class="header-right">
         <span class="badge">👤 <b id="badgeUsuario"></b> <span id="badgeAdmin"></span></span>
         <span class="badge timer hidden" id="badgeTimer"></span>
+        <button class="btn primary" id="btnFilmes">🎬 Filmes</button>
         <button class="btn" id="btnSair">Sair</button>
         <button class="btn primary" id="installBtn">📲 Instalar app</button>
       </div>
@@ -223,6 +239,21 @@
       <div class="load-status" id="loadStatus"></div>
     </div>
 
+    <div class="player-panel">
+      <div class="player-bar">
+        <span class="now" id="nowPlaying">Nenhum canal selecionado</span>
+        <span class="status" id="playStatus"></span>
+        <button class="btn-icon" id="btnCast" style="display:none" title="Transmitir para TV (Chromecast)">📡 Transmitir</button>
+        <button class="btn-icon" id="btnStop">⏹ Parar</button>
+        <button class="btn-icon" id="btnFull">⛶ Tela cheia</button>
+      </div>
+      <div class="video-wrap" id="videoWrap">
+        <video id="video" controls playsinline autoplay></video>
+        <iframe id="ytFrame" allow="autoplay; encrypted-media; picture-in-picture" allowfullscreen></iframe>
+        <div class="placeholder" id="placeholder">Selecione um canal abaixo para começar a assistir 🍿</div>
+      </div>
+    </div>
+
     <div class="controls-row">
       <div class="tabs">
         <button id="tabTodos" class="active">Todos</button>
@@ -235,19 +266,6 @@
     </div>
 
     <div class="ch-grid" id="chGrid"></div>
-
-    <div class="player-panel">
-      <div class="player-bar">
-        <span class="now" id="nowPlaying">Nenhum canal selecionado</span>
-        <span class="status" id="playStatus"></span>
-        <button class="btn-icon" id="btnStop">⏹ Parar</button>
-        <button class="btn-icon" id="btnFull">⛶ Tela cheia</button>
-      </div>
-      <div class="video-wrap" id="videoWrap">
-        <video id="video" controls playsinline autoplay></video>
-        <div class="placeholder" id="placeholder">Selecione um canal acima para começar a assistir 🍿</div>
-      </div>
-    </div>
   </div>
 
   <footer>
@@ -283,6 +301,13 @@
     });
   });
 
+  var CANAIS_OFICIAIS = [
+    { nome: 'SBT (oficial HD)', logo: '', grupo: 'Oficiais', url: 'yt:UCR3TOnFWDeAlT-Ho6LueDmg' },
+    { nome: 'Record News (oficial HD)', logo: '', grupo: 'Oficiais', url: 'yt:UCuiLR4p6wQ3xLEm15pEn1Xw' },
+    { nome: 'Band Ao Vivo (oficial HD)', logo: '', grupo: 'Oficiais', url: 'yt:UCilfEXKqavPruqCGdwDBlAQ' },
+    { nome: 'TV Brasil (oficial)', logo: '', grupo: 'Oficiais', url: 'yt:UCSv9d0kQegylHWpP83jWSQg' }
+  ];
+
   var LS = { favs: 'iptv:favoritos', rec: 'iptv:recentes' };
   var SESSAO = 'iptv:session';
   function lsGet(k, def) {
@@ -301,7 +326,9 @@
   var bloqueado = false;
 
   var video = document.getElementById('video');
+  var ytFrame = document.getElementById('ytFrame');
   var placeholder = document.getElementById('placeholder');
+  var btnCast = document.getElementById('btnCast');
 
   function esc(s) {
     return String(s).replace(/[&<>"']/g, function (c) {
@@ -351,7 +378,7 @@
       } else if (linha.charAt(0) !== '#') {
         if (atual) {
           atual.url = linha;
-          if (/^https?:\/\//i.test(linha)) out.push(atual);
+          if (/^https?:\/\//i.test(linha) || /^yt:/i.test(linha)) out.push(atual);
           atual = null;
         }
       }
@@ -375,8 +402,7 @@
   function bloquear(msg) {
     bloqueado = true;
     if (timerInterval) { clearInterval(timerInterval); timerInterval = null; }
-    limparHls();
-    video.pause();
+    limparPlayer();
     sessionStorage.removeItem(SESSAO);
     document.getElementById('appRoot').className = 'hidden';
     document.getElementById('loginScreen').className = '';
@@ -416,7 +442,8 @@
       if (dados.expiraEm && Date.now() > dados.expiraEm) {
         throw new Error('EXPIRADO');
       }
-      var base = (dados.canais || []).slice();
+      var base = CANAIS_OFICIAIS.slice();
+      (dados.canais || []).forEach(function (c) { base.push(c); });
       var promessaListas = Promise.resolve();
       if (dados.admin && dados.playlists && dados.playlists.length) {
         promessaListas = Promise.all(dados.playlists.map(function (p) {
@@ -473,14 +500,17 @@
   document.getElementById('btnSair').addEventListener('click', function () {
     sessionStorage.removeItem(SESSAO);
     if (timerInterval) { clearInterval(timerInterval); timerInterval = null; }
-    limparHls();
-    video.pause();
+    limparPlayer();
     placeholder.style.display = 'flex';
     document.getElementById('nowPlaying').textContent = 'Nenhum canal selecionado';
     document.getElementById('appRoot').className = 'hidden';
     document.getElementById('loginScreen').className = '';
     document.getElementById('loginChave').value = '';
     loginStatus('');
+  });
+
+  document.getElementById('btnFilmes').addEventListener('click', function () {
+    window.location.href = 'filmes.html';
   });
 
   var sessao = null;
@@ -550,30 +580,44 @@
     }).join('');
   }
 
+  function isYouTube(url) { return /^yt:/i.test(url); }
+  function ytEmbed(url) {
+    var ch = url.replace(/^yt:/i, '');
+    return 'https://www.youtube.com/embed/live_stream?channel=' + encodeURIComponent(ch) + '&autoplay=1';
+  }
+
   function tocar(canal) {
     canalAtual = canal;
     placeholder.style.display = 'none';
     document.getElementById('nowPlaying').textContent = canal.nome;
     setStatus('');
-    limparHls();
+    limparPlayer();
 
     var url = canal.url;
-    var isHls = /\.m3u8(\?|$)/i.test(url) || /m3u8/i.test(url);
 
-    if (isHls && window.Hls && Hls.isSupported()) {
-      hls = new Hls({ manifestLoadingTimeOut: 15000, manifestLoadingMaxRetry: 2 });
-      hls.loadSource(url);
-      hls.attachMedia(video);
-      hls.on(Hls.Events.ERROR, function (evt, data) {
-        if (data && data.fatal) {
-          setStatus('Erro ao reproduzir (stream indisponível ou bloqueado).', 'err');
-        }
-      });
+    if (isYouTube(url)) {
+      video.style.display = 'none';
+      ytFrame.style.display = 'block';
+      ytFrame.src = ytEmbed(url);
+      setStatus('▶ Reproduzindo (YouTube oficial)', 'ok');
     } else {
-      video.src = url;
-      video.play().catch(function () {
-        setStatus('Toque em ▶ para reproduzir.', '');
-      });
+      video.style.display = 'block';
+      var isHls = /\.m3u8(\?|$)/i.test(url) || /m3u8/i.test(url);
+      if (isHls && window.Hls && Hls.isSupported()) {
+        hls = new Hls({ manifestLoadingTimeOut: 15000, manifestLoadingMaxRetry: 2 });
+        hls.loadSource(url);
+        hls.attachMedia(video);
+        hls.on(Hls.Events.ERROR, function (evt, data) {
+          if (data && data.fatal) {
+            setStatus('Erro ao reproduzir (stream indisponível ou bloqueado).', 'err');
+          }
+        });
+      } else {
+        video.src = url;
+        video.play().catch(function () {
+          setStatus('Toque em ▶ para reproduzir.', '');
+        });
+      }
     }
 
     recentes = [canal.url].concat(recentes.filter(function (u) { return u !== canal.url; })).slice(0, 30);
@@ -587,10 +631,31 @@
     el.className = 'status' + (cls ? ' ' + cls : '');
   }
 
-  function limparHls() {
+  function limparPlayer() {
     if (hls) { hls.destroy(); hls = null; }
     video.removeAttribute('src');
     try { video.load(); } catch (e) {}
+    ytFrame.src = '';
+    ytFrame.style.display = 'none';
+    video.style.display = 'block';
+  }
+
+  if ('remote' in video) {
+    btnCast.style.display = 'inline-block';
+    btnCast.addEventListener('click', function () {
+      if (isYouTube(canalAtual ? canalAtual.url : '')) {
+        toast('📡 Use o botão de transmitir dentro do próprio player do YouTube.');
+        return;
+      }
+      try {
+        video.remote.prompt();
+      } catch (e) {
+        toast('Nenhum dispositivo Chromecast encontrado na rede.');
+      }
+    });
+    video.remote.watchAvailability(function (avail) {
+      btnCast.style.opacity = avail ? '1' : '.5';
+    }).catch(function () {});
   }
 
   document.getElementById('chGrid').addEventListener('click', function (e) {
@@ -663,7 +728,7 @@
   document.getElementById('tabRecentes').addEventListener('click', function () { setAba('recentes'); });
 
   document.getElementById('btnStop').addEventListener('click', function () {
-    limparHls();
+    limparPlayer();
     video.pause();
     placeholder.style.display = 'flex';
     document.getElementById('nowPlaying').textContent = 'Nenhum canal selecionado';
@@ -674,6 +739,10 @@
 
   document.getElementById('btnFull').addEventListener('click', function () {
     var wrap = document.getElementById('videoWrap');
+    if (isYouTube(canalAtual ? canalAtual.url : '')) {
+      if (ytFrame.requestFullscreen) ytFrame.requestFullscreen();
+      return;
+    }
     if (wrap.requestFullscreen) wrap.requestFullscreen();
     else if (video.webkitEnterFullscreen) video.webkitEnterFullscreen();
   });

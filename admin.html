@@ -79,6 +79,11 @@
   }
   .user-chip button { background: none; border: none; color: var(--muted); cursor: pointer; padding: 0 2px; }
   .user-chip button:hover { color: var(--red); }
+  .cat-item .url { color: #666; font-size: 0.68rem; font-family: monospace; max-width: 26%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .cat-item .edit { color: var(--muted); }
+  .cat-item .edit:hover { color: var(--red); }
+  .edit-form { display: flex; gap: 6px; width: 100%; flex-wrap: wrap; }
+  .edit-form input { flex: 1; min-width: 120px; padding: 7px 9px; font-size: 0.8rem; }
 </style>
 </head>
 <body>
@@ -114,7 +119,7 @@
       <div>
         <label for="manUrl">&nbsp;</label>
         <div style="display:flex;gap:8px">
-          <input type="url" id="manUrl" placeholder="https://.../stream.m3u8">
+          <input type="url" id="manUrl" placeholder="https://.../stream.m3u8 ou yt:ID_DO_CANAL">
           <button class="btn" id="btnManAdd">+ Adicionar</button>
         </div>
       </div>
@@ -279,8 +284,10 @@
     }
     box.innerHTML = filtrados.map(function (c) {
       return '<div class="cat-item" data-url="' + esc(c.url) + '">' +
-        '<span class="n">' + esc(c.nome) + '</span>' +
-        '<span class="g">' + esc(c.grupo) + '</span>' +
+        '<span class="n" title="' + esc(c.nome) + '">' + esc(c.nome) + '</span>' +
+        '<span class="g" title="' + esc(c.grupo) + '">' + esc(c.grupo) + '</span>' +
+        '<span class="url" title="' + esc(c.url) + '">' + esc(c.url) + '</span>' +
+        '<button class="edit" title="Ver / editar nome e link">✏️</button>' +
         '<button class="rm" title="Remover do catálogo">✕</button></div>';
     }).join('');
   }
@@ -323,11 +330,52 @@
   document.getElementById('pickBusca').addEventListener('input', renderPick);
 
   document.getElementById('catList').addEventListener('click', function (e) {
-    if (!e.target.classList.contains('rm')) return;
-    var url = e.target.closest('.cat-item').getAttribute('data-url');
-    catalogo = catalogo.filter(function (c) { return c.url !== url; });
-    delete selecao[url];
-    salvarCatalogo();
+    var item = e.target.closest('.cat-item');
+    if (!item) return;
+    var url = item.getAttribute('data-url');
+    if (e.target.classList.contains('rm')) {
+      catalogo = catalogo.filter(function (c) { return c.url !== url; });
+      delete selecao[url];
+      salvarCatalogo();
+      return;
+    }
+    if (e.target.classList.contains('edit')) {
+      var canal = null;
+      for (var i = 0; i < catalogo.length; i++) {
+        if (catalogo[i].url === url) { canal = catalogo[i]; break; }
+      }
+      if (!canal) return;
+      item.innerHTML = '<div class="edit-form">' +
+        '<input type="text" class="ed-nome" value="' + esc(canal.nome) + '" placeholder="Nome">' +
+        '<input type="text" class="ed-logo" value="' + esc(canal.logo || '') + '" placeholder="URL do logo (opcional)">' +
+        '<input type="text" class="ed-url" value="' + esc(canal.url) + '" placeholder="Link do stream (ou yt:ID)">' +
+        '<button class="btn primary ed-save">💾 Salvar</button>' +
+        '<button class="btn ed-cancel">Cancelar</button></div>';
+    }
+    if (e.target.classList.contains('ed-save')) {
+      var form = item.querySelector('.edit-form');
+      var novoNome = form.querySelector('.ed-nome').value.trim();
+      var novoLogo = form.querySelector('.ed-logo').value.trim();
+      var novaUrl = form.querySelector('.ed-url').value.trim();
+      if (!novoNome || !novaUrl) return;
+      var antiga = item.getAttribute('data-url');
+      for (var j = 0; j < catalogo.length; j++) {
+        if (catalogo[j].url === antiga) {
+          catalogo[j].nome = novoNome;
+          catalogo[j].logo = novoLogo;
+          catalogo[j].url = novaUrl;
+          break;
+        }
+      }
+      if (selecao[antiga]) { delete selecao[antiga]; selecao[novaUrl] = true; }
+      salvarCatalogo();
+      var st = document.getElementById('catStatus');
+      st.textContent = '✅ Canal atualizado.';
+      st.className = 'status ok';
+    }
+    if (e.target.classList.contains('ed-cancel')) {
+      renderCat();
+    }
   });
 
   document.getElementById('pickList').addEventListener('change', function (e) {
