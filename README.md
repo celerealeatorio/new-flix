@@ -38,12 +38,6 @@ Player de IPTV estilo Netflix (tema preto, linhas vermelhas) com **login por usu
 | `vendor/hls.min.js` | Player HLS (hls.js v1.7.4, Apache-2.0) |
 | `manifest.webmanifest` + `sw.js` + `icons/` | PWA e cache offline |
 
-## Limites honestos (app 100% estático)
-
-- O tempo de acesso usa o **relógio do aparelho** do usuário — quem mudar o relógio pode burlar a contagem
-- A proteção dos links é contra curiosos; alguém técnico com a chave pode ver a URL no tráfego
-- Para proteção forte, o caminho é um backend/proxy (ex.: Cloudflare Worker)
-
 ## Aviso legal
 
 Este projeto é apenas um reprodutor de mídia e **não fornece, hospeda nem indexa conteúdo**. Use somente listas que você tem direito legal de acessar.
