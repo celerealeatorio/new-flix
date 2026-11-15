@@ -3,109 +3,197 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>IPTV Player — Painel Admin</title>
+<title>NEWFLIX — Painel Admin</title>
 <meta name="robots" content="noindex">
-<meta name="theme-color" content="#0f1420">
+<meta name="theme-color" content="#0a0a0a">
 <style>
   :root {
-    --bg: #0f1420; --panel: #1a2130; --panel-2: #222b3d; --border: #2e3950;
-    --text: #e8edf5; --muted: #8b98ad; --blue: #4a90d9; --green: #2ecc71; --red: #e74c3c; --yellow: #f1c40f;
+    --bg: #0a0a0a; --panel: #141414; --panel-2: #1f1f1f; --border: #2a2a2a;
+    --text: #fff; --muted: #b3b3b3; --red: #e50914; --red-dark: #b20710; --green: #46d369;
   }
   * { margin: 0; padding: 0; box-sizing: border-box; }
   body { font-family: 'Segoe UI', system-ui, sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
-  .container { max-width: 760px; margin: 0 auto; padding: 24px 16px 60px; }
-  h1 { font-size: 1.4rem; margin-bottom: 4px; }
-  h1 span { color: var(--blue); }
+  .topbar { background: rgba(10,10,10,.95); border-bottom: 2px solid var(--red); position: sticky; top: 0; z-index: 10; }
+  .topbar-inner { max-width: 1100px; margin: 0 auto; padding: 12px 16px; display: flex; justify-content: space-between; align-items: center; }
+  .logo { font-size: 1.3rem; font-weight: 900; letter-spacing: 4px; color: var(--red); text-transform: uppercase; }
+  .container { max-width: 1100px; margin: 0 auto; padding: 22px 16px 60px; }
   .sub { color: var(--muted); font-size: 0.85rem; margin-bottom: 20px; }
-  .panel { background: var(--panel); border: 1px solid var(--border); border-radius: 12px; padding: 18px; margin-bottom: 16px; }
-  .panel h2 { font-size: 0.95rem; margin-bottom: 14px; }
-  label { display: block; font-size: 0.8rem; color: var(--muted); margin: 10px 0 4px; }
-  input[type=text], input[type=password], input[type=url] {
+  .panel {
+    background: var(--panel); border: 1px solid var(--border); border-left: 3px solid var(--red);
+    border-radius: 8px; padding: 20px; margin-bottom: 18px;
+  }
+  .panel h2 { font-size: 1rem; margin-bottom: 4px; }
+  .panel .desc { font-size: 0.8rem; color: var(--muted); margin-bottom: 14px; }
+  label { display: block; font-size: 0.75rem; color: var(--muted); margin: 12px 0 4px; text-transform: uppercase; letter-spacing: 1px; }
+  input[type=text], input[type=password], input[type=url], input[type=number], select {
     width: 100%; padding: 11px 12px; background: var(--panel-2); border: 1px solid var(--border);
-    border-radius: 8px; color: var(--text); font-size: 14px; outline: none;
+    border-radius: 6px; color: var(--text); font-size: 14px; outline: none;
   }
-  input:focus { border-color: var(--blue); }
+  input:focus, select:focus { border-color: var(--red); }
   .row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-  .playlist-row { display: grid; grid-template-columns: 1fr 2fr auto; gap: 8px; margin-bottom: 8px; align-items: center; }
-  .playlist-row button {
-    background: none; border: 1px solid var(--border); color: var(--muted); border-radius: 8px;
-    padding: 9px 11px; cursor: pointer;
+  .row-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; }
+  .btn {
+    padding: 11px 16px; border-radius: 6px; border: 1px solid var(--border);
+    background: var(--panel-2); color: var(--text); font-size: 0.88rem; font-weight: 600; cursor: pointer;
   }
-  .playlist-row button:hover { color: var(--red); border-color: var(--red); }
+  .btn:hover { border-color: var(--red); color: var(--red); }
+  .btn.primary { background: var(--red); border-color: var(--red); color: #fff; }
+  .btn.primary:hover { background: var(--red-dark); color: #fff; }
+  .btn.danger:hover { border-color: var(--red); color: var(--red); }
+  .btn-row { display: flex; gap: 10px; margin-top: 14px; flex-wrap: wrap; align-items: center; }
   .check { display: flex; align-items: center; gap: 8px; margin-top: 12px; font-size: 0.88rem; }
   .check input { width: auto; }
-  .btn {
-    padding: 12px 18px; border-radius: 8px; border: 1px solid var(--border);
-    background: var(--panel-2); color: var(--text); font-size: 0.9rem; font-weight: 600; cursor: pointer;
+  .cat-list { max-height: 320px; overflow-y: auto; border: 1px solid var(--border); border-radius: 6px; background: var(--panel-2); }
+  .cat-list::-webkit-scrollbar, .pick-list::-webkit-scrollbar { width: 6px; }
+  .cat-list::-webkit-scrollbar-thumb, .pick-list::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+  .cat-item, .pick-item {
+    display: flex; align-items: center; gap: 10px; padding: 8px 12px; font-size: 0.85rem;
+    border-bottom: 1px solid #191919;
   }
-  .btn.primary { background: var(--blue); border-color: var(--blue); color: #fff; }
-  .btn.primary:hover { filter: brightness(1.1); }
-  .btn:hover { border-color: var(--blue); }
-  .btn-row { display: flex; gap: 10px; margin-top: 14px; flex-wrap: wrap; }
+  .cat-item .n, .pick-item .n { flex: 1; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .cat-item .g, .pick-item .g { color: var(--muted); font-size: 0.72rem; max-width: 30%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .cat-item button, .pick-item input { flex-shrink: 0; }
+  .cat-item button { background: none; border: none; color: var(--muted); cursor: pointer; padding: 4px 8px; }
+  .cat-item button:hover { color: var(--red); }
+  .pick-list { max-height: 320px; overflow-y: auto; border: 1px solid var(--border); border-radius: 6px; background: var(--panel-2); }
+  .pick-item label { display: flex; margin: 0; text-transform: none; letter-spacing: 0; font-size: 0.85rem; color: var(--text); cursor: pointer; flex: 1; min-width: 0; }
+  .pick-item input { accent-color: var(--red); }
+  .radio-row { display: flex; gap: 18px; margin-top: 12px; flex-wrap: wrap; }
+  .radio-row label { display: flex; align-items: center; gap: 6px; margin: 0; text-transform: none; letter-spacing: 0; font-size: 0.88rem; color: var(--text); cursor: pointer; }
+  .radio-row input { accent-color: var(--red); }
   textarea {
-    width: 100%; min-height: 180px; background: var(--panel-2); border: 1px solid var(--border);
-    border-radius: 8px; color: var(--text); font-family: monospace; font-size: 0.8rem;
+    width: 100%; min-height: 200px; background: var(--panel-2); border: 1px solid var(--border);
+    border-radius: 6px; color: var(--text); font-family: monospace; font-size: 0.78rem;
     padding: 12px; outline: none; resize: vertical;
   }
   .status { font-size: 0.85rem; margin-top: 10px; min-height: 1.2em; }
   .status.ok { color: var(--green); }
   .status.err { color: var(--red); }
-  .note { font-size: 0.8rem; color: var(--muted); line-height: 1.6; margin-top: 10px; }
-  .note b { color: var(--yellow); }
+  .count { font-size: 0.8rem; color: var(--muted); }
+  .count b { color: var(--red); }
+  .note { font-size: 0.8rem; color: var(--muted); line-height: 1.7; margin-top: 10px; }
+  .note b { color: var(--red); }
+  .user-chip {
+    display: inline-flex; align-items: center; gap: 8px; background: var(--panel-2);
+    border: 1px solid var(--border); border-radius: 20px; padding: 6px 12px; font-size: 0.8rem; margin: 4px 6px 0 0;
+  }
+  .user-chip button { background: none; border: none; color: var(--muted); cursor: pointer; padding: 0 2px; }
+  .user-chip button:hover { color: var(--red); }
 </style>
 </head>
 <body>
+<div class="topbar"><div class="topbar-inner"><div class="logo">Newflix Admin</div><span class="count" id="resumo"></span></div></div>
 <div class="container">
-  <h1>🛠️ IPTV <span>Admin</span></h1>
-  <div class="sub">Gere as entradas criptografadas dos usuários. Os links das playlists <b>nunca</b> ficam legíveis no repositório.</div>
+  <div class="sub">Monte o catálogo, crie usuários com canais e tempo de acesso, e publique o arquivo usuarios.js. Os links <b style="color:var(--red)">nunca</b> ficam legíveis no repositório.</div>
 
   <div class="panel">
-    <h2>1. Dados do usuário</h2>
+    <h2>1. Catálogo de canais</h2>
+    <div class="desc">Carregue suas listas M3U uma vez — o catálogo fica salvo neste navegador (os links ficam só com você, fora do GitHub).</div>
     <div class="row">
+      <div>
+        <label for="catUrl">URL da playlist M3U</label>
+        <div style="display:flex;gap:8px">
+          <input type="url" id="catUrl" placeholder="https://.../lista.m3u">
+          <button class="btn primary" id="btnCatUrl">Importar</button>
+        </div>
+      </div>
+      <div>
+        <label for="catArquivoFake">Ou arquivo</label>
+        <div style="display:flex;gap:8px">
+          <input type="text" id="catArquivoFake" placeholder="Nenhum arquivo escolhido" readonly style="color:var(--muted)">
+          <button class="btn" id="btnCatArquivo">📁 Escolher</button>
+        </div>
+        <input type="file" id="catArquivo" accept=".m3u,.m3u8,text/plain" style="display:none">
+      </div>
+    </div>
+    <div class="row" style="margin-top:10px">
+      <div>
+        <label for="manNome">Adicionar canal manual</label>
+        <input type="text" id="manNome" placeholder="Nome do canal">
+      </div>
+      <div>
+        <label for="manUrl">&nbsp;</label>
+        <div style="display:flex;gap:8px">
+          <input type="url" id="manUrl" placeholder="https://.../stream.m3u8">
+          <button class="btn" id="btnManAdd">+ Adicionar</button>
+        </div>
+      </div>
+    </div>
+    <label style="margin-top:14px">Canais no catálogo (<span id="catCount">0</span>) — busca:</label>
+    <input type="text" id="catBusca" placeholder="🔍 Filtrar canais do catálogo...">
+    <div class="cat-list" id="catList" style="margin-top:8px"></div>
+    <div class="btn-row">
+      <button class="btn danger" id="btnCatLimpar">🗑️ Limpar catálogo</button>
+    </div>
+    <div class="status" id="catStatus"></div>
+  </div>
+
+  <div class="panel">
+    <h2>2. Criar / atualizar usuário</h2>
+    <div class="desc">Escolha os canais do catálogo que este usuário poderá ver e por quanto tempo.</div>
+    <div class="row-3">
       <div>
         <label for="usuario">Usuário (login)</label>
         <input type="text" id="usuario" placeholder="ex.: joao" autocomplete="off">
       </div>
       <div>
-        <label for="chave">Chave de acesso (senha)</label>
-        <input type="text" id="chave" placeholder="ex.: senha-forte-123" autocomplete="off">
+        <label for="chave">Chave de acesso</label>
+        <input type="text" id="chave" placeholder="senha do usuário" autocomplete="off">
+      </div>
+      <div>
+        <label for="tipoAcesso">Tempo de acesso</label>
+        <select id="tipoAcesso">
+          <option value="ilimitado">♾️ Ilimitado</option>
+          <option value="minutos">⏳ Por minutos</option>
+        </select>
+      </div>
+    </div>
+    <div class="row" id="minutosRow" style="display:none;margin-top:10px">
+      <div>
+        <label for="minutos">Minutos de acesso (conta a partir de agora)</label>
+        <input type="number" id="minutos" min="1" step="1" placeholder="ex.: 30">
       </div>
     </div>
     <div class="check">
       <input type="checkbox" id="isAdmin">
-      <label for="isAdmin" style="margin:0">Este usuário é administrador (pode carregar listas próprias no app)</label>
+      <label for="isAdmin" style="margin:0;text-transform:none;letter-spacing:0;font-size:0.88rem;color:var(--text)">
+        Administrador (pode carregar listas M3U próprias no app)
+      </label>
     </div>
 
-    <h2 style="margin-top:18px">2. Playlists deste usuário</h2>
-    <div id="playlists">
-      <div class="playlist-row">
-        <input type="text" class="pl-nome" placeholder="Nome (ex.: Canais BR)">
-        <input type="url" class="pl-url" placeholder="https://.../lista.m3u">
-        <button type="button" class="rm" title="Remover">✕</button>
-      </div>
+    <div class="btn-row" style="margin-top:16px">
+      <span class="count">Canais selecionados: <b id="selCount">0</b></span>
+      <button class="btn" id="btnSelTodos">Selecionar todos (filtrados)</button>
+      <button class="btn" id="btnSelNenhum">Limpar seleção</button>
     </div>
-    <div class="btn-row">
-      <button class="btn" id="btnAddPl">+ Adicionar playlist</button>
-    </div>
+    <label style="margin-top:12px">Canais do catálogo — marque os que este usuário poderá ver:</label>
+    <input type="text" id="pickBusca" placeholder="🔍 Filtrar...">
+    <div class="pick-list" id="pickList" style="margin-top:8px"></div>
 
     <div class="btn-row">
-      <button class="btn primary" id="btnGerar">🔐 Gerar entrada criptografada</button>
+      <button class="btn primary" id="btnGerar">🔐 Gerar / atualizar usuário</button>
     </div>
-    <div class="status" id="status"></div>
+    <div class="status" id="gerStatus"></div>
   </div>
 
   <div class="panel">
-    <h2>3. Arquivo usuarios.js</h2>
-    <textarea id="saida" spellcheck="false" placeholder="As entradas geradas aparecem aqui..."></textarea>
+    <h2>3. Usuários criados (nesta sessão)</h2>
+    <div id="listaUsuarios"></div>
+  </div>
+
+  <div class="panel">
+    <h2>4. Publicar — arquivo usuarios.js</h2>
+    <textarea id="saida" spellcheck="false" placeholder="O conteúdo de usuarios.js aparece aqui após gerar usuários..."></textarea>
     <div class="btn-row">
-      <button class="btn" id="btnCopiar">📋 Copiar conteúdo</button>
+      <button class="btn" id="btnCopiar">📋 Copiar</button>
       <button class="btn" id="btnBaixar">⬇️ Baixar usuarios.js</button>
     </div>
     <div class="note">
-      <b>Como usar:</b> copie o conteúdo acima, substitua todo o conteúdo do arquivo
-      <b>usuarios.js</b> no repositório e faça o commit/push. Em seguida, passe o
-      <b>usuário</b> e a <b>chave</b> para a pessoa. Ela entra em
-      <b>index.html</b> com esses dados. Para revogar um acesso, gere o arquivo novamente sem a entrada dela.
+      <b>Como publicar:</b> copie o conteúdo, abra o arquivo <b>usuarios.js</b> no GitHub
+      (botão ✏️ de editar), substitua tudo, cole e faça o commit. Os usuários entram no app
+      com o login e a chave. <b>Tempo de acesso:</b> começa a contar no momento da geração;
+      ao expirar, o app bloqueia automaticamente (mesmo assistindo). Para renovar, gere o
+      usuário novamente com a mesma chave. <b>Revogar:</b> remova o usuário na seção 3 e publique.
     </div>
   </div>
 </div>
@@ -114,7 +202,17 @@
 <script>
 (function () {
   'use strict';
-  var entradas = [];
+
+  var LS_CAT = 'iptv:catalogo';
+  var LS_ENT = 'iptv:entradas';
+  function lsGet(k, def) {
+    try { return JSON.parse(localStorage.getItem(k)) || def; } catch (e) { return def; }
+  }
+  function lsSet(k, v) { localStorage.setItem(k, JSON.stringify(v)); }
+
+  var catalogo = lsGet(LS_CAT, []);
+  var entradas = lsGet(LS_ENT, []);
+  var selecao = {};
 
   function esc(s) {
     return String(s).replace(/[&<>"']/g, function (c) {
@@ -122,54 +220,244 @@
     });
   }
 
-  document.getElementById('btnAddPl').addEventListener('click', function () {
-    var div = document.createElement('div');
-    div.className = 'playlist-row';
-    div.innerHTML = '<input type="text" class="pl-nome" placeholder="Nome (ex.: Canais BR)">' +
-      '<input type="url" class="pl-url" placeholder="https://.../lista.m3u">' +
-      '<button type="button" class="rm" title="Remover">✕</button>';
-    document.getElementById('playlists').appendChild(div);
+  function parseM3U(texto) {
+    var linhas = texto.split(/\r?\n/);
+    var out = [];
+    var atual = null;
+    for (var i = 0; i < linhas.length; i++) {
+      var linha = linhas[i].trim();
+      if (!linha) continue;
+      if (linha.indexOf('#EXTINF') === 0) {
+        var virgula = linha.indexOf(',');
+        var nome = virgula >= 0 ? linha.slice(virgula + 1).trim() : 'Canal';
+        var attrs = {};
+        var attrPart = virgula >= 0 ? linha.slice(0, virgula) : linha;
+        var re = /([a-zA-Z0-9_-]+)="([^"]*)"/g;
+        var m;
+        while ((m = re.exec(attrPart)) !== null) attrs[m[1].toLowerCase()] = m[2];
+        atual = { nome: nome, logo: attrs['tvg-logo'] || '', grupo: attrs['group-title'] || 'Sem grupo', url: '' };
+      } else if (linha.charAt(0) !== '#') {
+        if (atual) {
+          atual.url = linha;
+          if (/^https?:\/\//i.test(linha)) out.push(atual);
+          atual = null;
+        }
+      }
+    }
+    return out;
+  }
+
+  function salvarCatalogo() {
+    lsSet(LS_CAT, catalogo);
+    document.getElementById('catCount').textContent = catalogo.length;
+    atualizarResumo();
+    renderCat();
+    renderPick();
+  }
+
+  function salvarEntradas() {
+    lsSet(LS_ENT, entradas);
+    atualizarSaida();
+    renderUsuarios();
+    atualizarResumo();
+  }
+
+  function atualizarResumo() {
+    document.getElementById('resumo').textContent =
+      catalogo.length + ' canais no catálogo · ' + entradas.length + ' usuário(s)';
+  }
+
+  function renderCat() {
+    var box = document.getElementById('catList');
+    var busca = document.getElementById('catBusca').value.toLowerCase().trim();
+    var filtrados = catalogo.filter(function (c) {
+      return !busca || c.nome.toLowerCase().indexOf(busca) !== -1;
+    });
+    if (!filtrados.length) {
+      box.innerHTML = '<div class="cat-item" style="color:var(--muted)">Catálogo vazio — importe uma lista M3U acima ou adicione canais manuais.</div>';
+      return;
+    }
+    box.innerHTML = filtrados.map(function (c) {
+      return '<div class="cat-item" data-url="' + esc(c.url) + '">' +
+        '<span class="n">' + esc(c.nome) + '</span>' +
+        '<span class="g">' + esc(c.grupo) + '</span>' +
+        '<button class="rm" title="Remover do catálogo">✕</button></div>';
+    }).join('');
+  }
+
+  function renderPick() {
+    var box = document.getElementById('pickList');
+    var busca = document.getElementById('pickBusca').value.toLowerCase().trim();
+    var filtrados = catalogo.filter(function (c) {
+      return !busca || c.nome.toLowerCase().indexOf(busca) !== -1;
+    });
+    if (!catalogo.length) {
+      box.innerHTML = '<div class="pick-item" style="color:var(--muted)">Importe canais no catálogo (seção 1) primeiro.</div>';
+      return;
+    }
+    if (!filtrados.length) {
+      box.innerHTML = '<div class="pick-item" style="color:var(--muted)">Nenhum canal encontrado para essa busca.</div>';
+      return;
+    }
+    var max = 400;
+    var html = filtrados.slice(0, max).map(function (c) {
+      var marcado = selecao[c.url] ? ' checked' : '';
+      return '<div class="pick-item">' +
+        '<input type="checkbox" class="pk" data-url="' + esc(c.url) + '"' + marcado + '>' +
+        '<label><span class="n">' + esc(c.nome) + '</span></label>' +
+        '<span class="g">' + esc(c.grupo) + '</span></div>';
+    }).join('');
+    if (filtrados.length > max) {
+      html += '<div class="pick-item" style="color:var(--muted)">… e mais ' + (filtrados.length - max) +
+        ' canais. Use a busca para refinar.</div>';
+    }
+    box.innerHTML = html;
+    atualizarSelCount();
+  }
+
+  function atualizarSelCount() {
+    document.getElementById('selCount').textContent = Object.keys(selecao).length;
+  }
+
+  document.getElementById('catBusca').addEventListener('input', renderCat);
+  document.getElementById('pickBusca').addEventListener('input', renderPick);
+
+  document.getElementById('catList').addEventListener('click', function (e) {
+    if (!e.target.classList.contains('rm')) return;
+    var url = e.target.closest('.cat-item').getAttribute('data-url');
+    catalogo = catalogo.filter(function (c) { return c.url !== url; });
+    delete selecao[url];
+    salvarCatalogo();
   });
 
-  document.getElementById('playlists').addEventListener('click', function (e) {
-    if (e.target.classList.contains('rm')) {
-      var rows = document.querySelectorAll('.playlist-row');
-      if (rows.length > 1) e.target.closest('.playlist-row').remove();
+  document.getElementById('pickList').addEventListener('change', function (e) {
+    if (!e.target.classList.contains('pk')) return;
+    var url = e.target.getAttribute('data-url');
+    if (e.target.checked) selecao[url] = true; else delete selecao[url];
+    atualizarSelCount();
+  });
+
+  document.getElementById('btnCatUrl').addEventListener('click', function () {
+    var url = document.getElementById('catUrl').value.trim();
+    var st = document.getElementById('catStatus');
+    if (!url) { st.textContent = '❌ Informe a URL.'; st.className = 'status err'; return; }
+    st.textContent = '⏳ Importando...';
+    st.className = 'status';
+    fetch(url).then(function (r) {
+      if (!r.ok) throw new Error('HTTP ' + r.status);
+      return r.text();
+    }).then(function (txt) {
+      var lista = parseM3U(txt);
+      if (!lista.length) throw new Error('nenhum canal encontrado');
+      var urls = {};
+      catalogo.forEach(function (c) { urls[c.url] = true; });
+      var novos = 0;
+      lista.forEach(function (c) {
+        if (!urls[c.url]) { catalogo.push(c); urls[c.url] = true; novos++; }
+      });
+      salvarCatalogo();
+      st.textContent = '✅ ' + novos + ' novos canais importados (total: ' + catalogo.length + ').';
+      st.className = 'status ok';
+    }).catch(function (e) {
+      st.textContent = '❌ Falha: ' + e.message + '. Se for CORS, baixe o arquivo e importe por arquivo.';
+      st.className = 'status err';
+    });
+  });
+
+  document.getElementById('btnCatArquivo').addEventListener('click', function () {
+    document.getElementById('catArquivo').click();
+  });
+  document.getElementById('catArquivo').addEventListener('change', function (e) {
+    var file = e.target.files[0];
+    if (!file) return;
+    document.getElementById('catArquivoFake').value = file.name;
+    var reader = new FileReader();
+    reader.onload = function () {
+      var lista = parseM3U(reader.result);
+      var urls = {};
+      catalogo.forEach(function (c) { urls[c.url] = true; });
+      var novos = 0;
+      lista.forEach(function (c) {
+        if (!urls[c.url]) { catalogo.push(c); urls[c.url] = true; novos++; }
+      });
+      salvarCatalogo();
+      var st = document.getElementById('catStatus');
+      st.textContent = '✅ ' + novos + ' novos canais do arquivo (total: ' + catalogo.length + ').';
+      st.className = 'status ok';
+    };
+    reader.readAsText(file);
+    e.target.value = '';
+  });
+
+  document.getElementById('btnManAdd').addEventListener('click', function () {
+    var nome = document.getElementById('manNome').value.trim();
+    var url = document.getElementById('manUrl').value.trim();
+    var st = document.getElementById('catStatus');
+    if (!nome || !url) { st.textContent = '❌ Informe nome e URL.'; st.className = 'status err'; return; }
+    var existe = catalogo.some(function (c) { return c.url === url; });
+    if (existe) { st.textContent = '⚠️ Este canal já está no catálogo.'; st.className = 'status'; return; }
+    catalogo.push({ nome: nome, logo: '', grupo: 'Manual', url: url });
+    document.getElementById('manNome').value = '';
+    document.getElementById('manUrl').value = '';
+    salvarCatalogo();
+    st.textContent = '✅ Canal adicionado ao catálogo.';
+    st.className = 'status ok';
+  });
+
+  document.getElementById('btnCatLimpar').addEventListener('click', function () {
+    if (!catalogo.length) return;
+    if (confirm('Limpar TODO o catálogo? (Os usuários já criados não são afetados.)')) {
+      catalogo = [];
+      selecao = {};
+      salvarCatalogo();
     }
   });
 
-  function coletar() {
+  document.getElementById('btnSelTodos').addEventListener('click', function () {
+    var busca = document.getElementById('pickBusca').value.toLowerCase().trim();
+    catalogo.forEach(function (c) {
+      if (!busca || c.nome.toLowerCase().indexOf(busca) !== -1) selecao[c.url] = true;
+    });
+    renderPick();
+  });
+  document.getElementById('btnSelNenhum').addEventListener('click', function () {
+    selecao = {};
+    renderPick();
+  });
+
+  document.getElementById('tipoAcesso').addEventListener('change', function () {
+    document.getElementById('minutosRow').style.display = this.value === 'minutos' ? 'grid' : 'none';
+  });
+
+  document.getElementById('btnGerar').addEventListener('click', function () {
+    var st = document.getElementById('gerStatus');
     var usuario = document.getElementById('usuario').value.trim();
     var chave = document.getElementById('chave').value;
     var admin = document.getElementById('isAdmin').checked;
-    var playlists = [];
-    Array.prototype.forEach.call(document.querySelectorAll('.playlist-row'), function (row) {
-      var nome = row.querySelector('.pl-nome').value.trim();
-      var url = row.querySelector('.pl-url').value.trim();
-      if (nome && url) playlists.push({ nome: nome, url: url });
-    });
-    if (!usuario || !chave) return { erro: 'Informe usuário e chave.' };
-    if (!playlists.length) return { erro: 'Adicione ao menos uma playlist.' };
-    for (var i = 0; i < playlists.length; i++) {
-      if (!/^https?:\/\//i.test(playlists[i].url)) return { erro: 'URL inválida: ' + playlists[i].url };
-    }
-    return { usuario: usuario, chave: chave, admin: admin, playlists: playlists };
-  }
+    var tipo = document.getElementById('tipoAcesso').value;
+    var minutos = Number(document.getElementById('minutos').value);
 
-  document.getElementById('btnGerar').addEventListener('click', function () {
-    var st = document.getElementById('status');
-    var d = coletar();
-    if (d.erro) { st.textContent = '❌ ' + d.erro; st.className = 'status err'; return; }
+    if (!usuario || !chave) { st.textContent = '❌ Informe usuário e chave.'; st.className = 'status err'; return; }
+    if (tipo === 'minutos' && (!minutos || minutos < 1)) { st.textContent = '❌ Informe os minutos de acesso.'; st.className = 'status err'; return; }
+
+    var canaisSel = catalogo.filter(function (c) { return selecao[c.url]; });
+    if (!admin && !canaisSel.length) { st.textContent = '❌ Selecione ao menos um canal para o usuário.'; st.className = 'status err'; return; }
+
+    var payload = {
+      admin: admin,
+      expiraEm: tipo === 'minutos' ? Date.now() + minutos * 60000 : null,
+      canais: canaisSel
+    };
+
     st.textContent = '⏳ Criptografando (pode levar alguns segundos)...';
     st.className = 'status';
-    var payload = JSON.stringify({ admin: d.admin, playlists: d.playlists });
-    IptvCrypto.criptografar(payload, d.chave).then(function (enc) {
-      entradas = entradas.filter(function (e) { return e.usuario.toLowerCase() !== d.usuario.toLowerCase(); });
-      entradas.push({ usuario: d.usuario, salt: enc.salt, iv: enc.iv, dados: enc.dados });
+    IptvCrypto.criptografar(JSON.stringify(payload), chave).then(function (enc) {
+      entradas = entradas.filter(function (e) { return e.usuario.toLowerCase() !== usuario.toLowerCase(); });
+      entradas.push({ usuario: usuario, salt: enc.salt, iv: enc.iv, dados: enc.dados });
       entradas.sort(function (a, b) { return a.usuario.localeCompare(b.usuario); });
-      document.getElementById('saida').value =
-        'window.USUARIOS = ' + JSON.stringify(entradas, null, 2) + ';\n';
-      st.textContent = '✅ Entrada de "' + d.usuario + '" gerada! Copie para o arquivo usuarios.js.';
+      salvarEntradas();
+      var tempo = tipo === 'minutos' ? minutos + ' minuto(s)' : 'ilimitado';
+      st.textContent = '✅ Usuário "' + usuario + '" gerado — ' + canaisSel.length + ' canal(is), acesso ' + tempo + '. Publique o usuarios.js (seção 4).';
       st.className = 'status ok';
     }).catch(function (e) {
       st.textContent = '❌ Erro: ' + e.message;
@@ -177,13 +465,41 @@
     });
   });
 
+  function renderUsuarios() {
+    var box = document.getElementById('listaUsuarios');
+    if (!entradas.length) {
+      box.innerHTML = '<div class="count">Nenhum usuário gerado neste navegador ainda.</div>';
+      return;
+    }
+    box.innerHTML = entradas.map(function (e) {
+      return '<span class="user-chip">👤 <b>' + esc(e.usuario) + '</b>' +
+        '<button class="rmuser" data-u="' + esc(e.usuario) + '" title="Remover">✕</button></span>';
+    }).join('');
+  }
+
+  document.getElementById('listaUsuarios').addEventListener('click', function (e) {
+    if (!e.target.classList.contains('rmuser')) return;
+    var u = e.target.getAttribute('data-u');
+    if (confirm('Remover o usuário "' + u + '" da saída? (Depois publique o usuarios.js para revogar o acesso.)')) {
+      entradas = entradas.filter(function (e2) { return e2.usuario !== u; });
+      salvarEntradas();
+    }
+  });
+
+  function atualizarSaida() {
+    document.getElementById('saida').value = entradas.length
+      ? 'window.USUARIOS = ' + JSON.stringify(entradas, null, 2) + ';\n'
+      : '';
+  }
+
   document.getElementById('btnCopiar').addEventListener('click', function () {
     var ta = document.getElementById('saida');
     if (!ta.value) return;
     ta.select();
     navigator.clipboard.writeText(ta.value).then(function () {
-      document.getElementById('status').textContent = '📋 Copiado!';
-      document.getElementById('status').className = 'status ok';
+      var st = document.getElementById('gerStatus');
+      st.textContent = '📋 Copiado! Cole no arquivo usuarios.js do GitHub e faça o commit.';
+      st.className = 'status ok';
     });
   });
 
@@ -198,6 +514,9 @@
     a.click();
     document.body.removeChild(a);
   });
+
+  salvarCatalogo();
+  salvarEntradas();
 })();
 </script>
 </body>

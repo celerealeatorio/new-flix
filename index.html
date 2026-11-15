@@ -3,172 +3,190 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-<title>IPTV Player</title>
-<meta name="description" content="Player de IPTV para listas M3U/M3U8 — acesso controlado por usuário.">
-<meta name="theme-color" content="#0f1420">
+<title>NEWFLIX — IPTV Player</title>
+<meta name="description" content="Player de IPTV com acesso controlado por usuário e tempo.">
+<meta name="theme-color" content="#0a0a0a">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="icon" href="icons/icon-192.png">
 <link rel="apple-touch-icon" href="icons/icon-192.png">
 <meta name="mobile-web-app-capable" content="yes">
 <style>
   :root {
-    --bg: #0f1420;
-    --panel: #1a2130;
-    --panel-2: #222b3d;
-    --border: #2e3950;
-    --text: #e8edf5;
-    --muted: #8b98ad;
-    --blue: #4a90d9;
-    --green: #2ecc71;
-    --red: #e74c3c;
-    --yellow: #f1c40f;
+    --bg: #0a0a0a;
+    --panel: #141414;
+    --panel-2: #1f1f1f;
+    --border: #2a2a2a;
+    --text: #ffffff;
+    --muted: #b3b3b3;
+    --red: #e50914;
+    --red-dark: #b20710;
   }
   * { margin: 0; padding: 0; box-sizing: border-box; }
   body {
     font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
     background: var(--bg); color: var(--text); min-height: 100vh;
   }
+
   #loginScreen {
-    position: fixed; inset: 0; background: var(--bg); z-index: 100;
+    position: fixed; inset: 0; z-index: 100;
+    background: radial-gradient(ellipse at 50% 0%, rgba(229,9,20,.12), transparent 60%), var(--bg);
     display: flex; align-items: center; justify-content: center; padding: 16px;
   }
   #loginScreen.hidden { display: none; }
   .login-card {
-    background: var(--panel); border: 1px solid var(--border); border-radius: 14px;
-    padding: 28px 24px; width: 100%; max-width: 380px;
+    background: rgba(20,20,20,.92); border: 1px solid var(--border); border-top: 3px solid var(--red);
+    border-radius: 10px; padding: 32px 28px; width: 100%; max-width: 400px;
+    box-shadow: 0 20px 60px rgba(0,0,0,.7);
   }
-  .login-card h1 { font-size: 1.3rem; margin-bottom: 4px; }
-  .login-card h1 span { color: var(--blue); }
-  .login-card .sub { color: var(--muted); font-size: 0.82rem; margin-bottom: 18px; }
-  .login-card label { display: block; font-size: 0.8rem; color: var(--muted); margin: 10px 0 4px; }
+  .logo { font-size: 1.6rem; font-weight: 900; letter-spacing: 4px; color: var(--red); text-transform: uppercase; }
+  .logo small { display: block; font-size: .65rem; letter-spacing: 3px; color: var(--muted); font-weight: 400; margin-top: 2px; }
+  .login-card .sub { color: var(--muted); font-size: 0.85rem; margin: 14px 0 6px; }
+  .login-card label { display: block; font-size: 0.78rem; color: var(--muted); margin: 12px 0 5px; text-transform: uppercase; letter-spacing: 1px; }
   .login-card input {
-    width: 100%; padding: 12px; background: var(--panel-2); border: 1px solid var(--border);
-    border-radius: 8px; color: var(--text); font-size: 16px; outline: none;
+    width: 100%; padding: 13px; background: var(--panel-2); border: 1px solid var(--border);
+    border-radius: 6px; color: var(--text); font-size: 16px; outline: none;
   }
-  .login-card input:focus { border-color: var(--blue); }
+  .login-card input:focus { border-color: var(--red); }
   .login-card button {
-    width: 100%; padding: 13px; margin-top: 16px; border: none; border-radius: 8px;
-    background: var(--blue); color: #fff; font-size: 1rem; font-weight: 600; cursor: pointer;
+    width: 100%; padding: 13px; margin-top: 18px; border: none; border-radius: 6px;
+    background: var(--red); color: #fff; font-size: 1rem; font-weight: 700; cursor: pointer;
+    letter-spacing: 1px; text-transform: uppercase;
   }
-  .login-card button:hover { filter: brightness(1.1); }
+  .login-card button:hover { background: var(--red-dark); }
   .login-card button:disabled { opacity: .6; cursor: wait; }
-  #loginStatus { font-size: 0.82rem; margin-top: 10px; min-height: 1.2em; }
-  #loginStatus.err { color: var(--red); }
+  #loginStatus { font-size: 0.85rem; margin-top: 12px; min-height: 1.2em; }
+  #loginStatus.err { color: var(--red); font-weight: 600; }
 
-  .container { max-width: 1300px; margin: 0 auto; padding: 16px 14px 50px; }
-  #appRoot.hidden { display: none; }
-  header { display: flex; justify-content: space-between; align-items: center; gap: 10px; margin-bottom: 16px; flex-wrap: wrap; }
-  header h1 { font-size: 1.4rem; font-weight: 700; }
-  header h1 span { color: var(--blue); }
+  .topbar {
+    position: sticky; top: 0; z-index: 40; background: rgba(10,10,10,.95);
+    border-bottom: 2px solid var(--red); backdrop-filter: blur(8px);
+  }
+  .topbar-inner {
+    max-width: 1400px; margin: 0 auto; padding: 12px 16px;
+    display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap;
+  }
+  .topbar .logo { font-size: 1.25rem; }
+  .topbar .logo small { display: none; }
   .header-right { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
-  .user-badge {
-    font-size: 0.8rem; color: var(--muted); background: var(--panel); border: 1px solid var(--border);
+  .badge {
+    font-size: 0.78rem; color: var(--muted); background: var(--panel); border: 1px solid var(--border);
     padding: 7px 12px; border-radius: 20px;
   }
-  .user-badge b { color: var(--text); }
+  .badge b { color: var(--text); }
+  .badge.timer { color: var(--text); border-color: var(--red); }
+  .badge.timer.warn { color: var(--red); font-weight: 700; }
+
+  .container { max-width: 1400px; margin: 0 auto; padding: 18px 16px 60px; }
+  #appRoot.hidden, .hidden { display: none; }
 
   .load-panel {
-    background: var(--panel); border: 1px solid var(--border); border-radius: 12px;
-    padding: 16px; margin-bottom: 16px;
+    background: var(--panel); border: 1px solid var(--border); border-left: 3px solid var(--red);
+    border-radius: 8px; padding: 16px; margin-bottom: 18px;
   }
-  .load-panel.hidden { display: none; }
   .load-panel h2 { font-size: 0.95rem; margin-bottom: 12px; }
   .load-row { display: flex; gap: 8px; flex-wrap: wrap; }
   .load-row input[type=text] {
     flex: 1; min-width: 200px; padding: 11px 12px; background: var(--panel-2);
-    border: 1px solid var(--border); border-radius: 8px; color: var(--text);
+    border: 1px solid var(--border); border-radius: 6px; color: var(--text);
     font-size: 14px; outline: none;
   }
-  .load-row input:focus { border-color: var(--blue); }
+  .load-row input:focus { border-color: var(--red); }
   .btn {
-    padding: 11px 16px; border-radius: 8px; border: 1px solid var(--border);
-    background: var(--panel-2); color: var(--text); font-size: 0.9rem;
+    padding: 11px 16px; border-radius: 6px; border: 1px solid var(--border);
+    background: var(--panel-2); color: var(--text); font-size: 0.88rem;
     font-weight: 600; cursor: pointer; white-space: nowrap;
   }
-  .btn:hover { border-color: var(--blue); color: var(--blue); }
-  .btn.primary { background: var(--blue); border-color: var(--blue); color: #fff; }
-  .btn.primary:hover { filter: brightness(1.1); color: #fff; }
+  .btn:hover { border-color: var(--red); color: var(--red); }
+  .btn.primary { background: var(--red); border-color: var(--red); color: #fff; }
+  .btn.primary:hover { background: var(--red-dark); color: #fff; }
   .load-status { font-size: 0.8rem; color: var(--muted); margin-top: 10px; min-height: 1em; }
   .load-status.err { color: var(--red); }
-  .load-status.ok { color: var(--green); }
+  .load-status.ok { color: #46d369; }
 
-  .main-grid { display: grid; grid-template-columns: 340px 1fr; gap: 16px; align-items: start; }
-  @media (max-width: 900px) {
-    .main-grid { grid-template-columns: 1fr; }
-    .player-panel { order: -1; }
+  .controls-row { display: flex; gap: 10px; margin-bottom: 16px; flex-wrap: wrap; align-items: center; }
+  .tabs { display: flex; gap: 6px; }
+  .tabs button {
+    padding: 9px 16px; border-radius: 6px; border: 1px solid var(--border);
+    background: var(--panel); color: var(--muted); font-size: 0.85rem; font-weight: 600; cursor: pointer;
   }
-  .panel { background: var(--panel); border: 1px solid var(--border); border-radius: 12px; padding: 14px; }
-  .panel h2 { font-size: 0.95rem; margin-bottom: 12px; }
+  .tabs button.active { color: #fff; border-color: var(--red); background: rgba(229,9,20,.15); }
+  .controls-row input[type=text], .controls-row select {
+    padding: 10px 12px; background: var(--panel); border: 1px solid var(--border);
+    border-radius: 6px; color: var(--text); font-size: 14px; outline: none;
+  }
+  .controls-row input[type=text] { flex: 1; min-width: 160px; }
+  .controls-row input[type=text]:focus { border-color: var(--red); }
+  .controls-row select { max-width: 180px; }
+  #chCount { color: var(--muted); font-size: 0.85rem; }
 
-  .list-controls { display: flex; gap: 8px; margin-bottom: 10px; }
-  .list-controls input, .list-controls select {
-    padding: 9px 10px; background: var(--panel-2); border: 1px solid var(--border);
-    border-radius: 8px; color: var(--text); font-size: 13px; outline: none;
+  .ch-grid {
+    display: grid; grid-template-columns: repeat(auto-fill, minmax(170px, 1fr)); gap: 14px;
   }
-  .list-controls input { flex: 1; min-width: 60px; }
-  .list-controls select { max-width: 130px; }
+  .ch-card {
+    position: relative; background: var(--panel); border: 1px solid var(--border); border-radius: 8px;
+    overflow: hidden; cursor: pointer; transition: transform .15s, border-color .15s, box-shadow .15s;
+  }
+  .ch-card:hover {
+    transform: scale(1.04); border-color: var(--red);
+    box-shadow: 0 8px 24px rgba(229,9,20,.25); z-index: 2;
+  }
+  .ch-card.active { border-color: var(--red); box-shadow: 0 0 0 2px var(--red); }
+  .ch-card .thumb {
+    aspect-ratio: 16 / 9; background: linear-gradient(135deg, #1a1a1a, #101010);
+    display: flex; align-items: center; justify-content: center; overflow: hidden; padding: 10px;
+  }
+  .ch-card .thumb img { max-width: 80%; max-height: 80%; object-fit: contain; }
+  .ch-card .thumb .no-logo { color: #444; font-size: 1.6rem; }
+  .ch-card .txt { padding: 10px 12px 12px; border-top: 2px solid var(--red); }
+  .ch-card .txt .name {
+    font-size: 0.85rem; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  }
+  .ch-card .txt .group { font-size: 0.7rem; color: var(--muted); margin-top: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .ch-card .fav {
+    position: absolute; top: 6px; right: 6px; background: rgba(0,0,0,.6); border: none;
+    color: var(--muted); font-size: 1rem; cursor: pointer; padding: 5px 7px; border-radius: 6px; z-index: 3;
+  }
+  .ch-card .fav.on { color: var(--red); }
+  .empty-list { text-align: center; color: var(--muted); padding: 60px 16px; font-size: 0.95rem; grid-column: 1 / -1; }
 
-  .ch-list { list-style: none; max-height: 560px; overflow-y: auto; }
-  .ch-list::-webkit-scrollbar { width: 6px; }
-  .ch-list::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
-  .ch {
-    display: flex; align-items: center; gap: 10px; padding: 9px 10px; border-radius: 10px;
-    cursor: pointer; margin-bottom: 4px; border: 1px solid transparent;
-  }
-  .ch:hover { background: var(--panel-2); }
-  .ch.active { background: rgba(74,144,217,.15); border-color: var(--blue); }
-  .ch .logo {
-    width: 42px; height: 30px; border-radius: 6px; background: var(--panel-2);
-    display: flex; align-items: center; justify-content: center; flex-shrink: 0;
-    font-size: 0.65rem; color: var(--muted); overflow: hidden;
-  }
-  .ch .logo img { max-width: 100%; max-height: 100%; object-fit: contain; }
-  .ch .info { flex: 1; min-width: 0; }
-  .ch .info .name { font-size: 0.88rem; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-  .ch .info .group { font-size: 0.7rem; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-  .ch .fav { background: none; border: none; cursor: pointer; font-size: 1rem; color: var(--muted); padding: 6px; }
-  .ch .fav.on { color: var(--yellow); }
-
-  .player-panel { position: sticky; top: 12px; }
+  .player-panel { margin-top: 22px; }
   .video-wrap {
-    position: relative; background: #000; border-radius: 10px; overflow: hidden;
+    position: relative; background: #000; border-radius: 8px; overflow: hidden;
     aspect-ratio: 16 / 9; display: flex; align-items: center; justify-content: center;
+    border: 1px solid var(--border); max-height: 72vh;
   }
   .video-wrap video { width: 100%; height: 100%; background: #000; }
-  .video-wrap .placeholder { color: var(--muted); font-size: 0.9rem; text-align: center; padding: 20px; }
-  .player-bar { display: flex; align-items: center; gap: 10px; margin-top: 10px; flex-wrap: wrap; }
-  .player-bar .now { flex: 1; min-width: 120px; font-weight: 600; font-size: 0.95rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .video-wrap .placeholder { color: var(--muted); font-size: 0.95rem; text-align: center; padding: 20px; }
+  .player-bar {
+    display: flex; align-items: center; gap: 10px; padding: 12px 2px; flex-wrap: wrap;
+    border-bottom: 2px solid var(--red); margin-bottom: 4px;
+  }
+  .player-bar .now { flex: 1; min-width: 120px; font-weight: 700; font-size: 1rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   .player-bar .status { font-size: 0.75rem; color: var(--muted); }
   .player-bar .status.err { color: var(--red); }
   .btn-icon {
     background: var(--panel-2); border: 1px solid var(--border); color: var(--text);
-    border-radius: 8px; padding: 9px 13px; cursor: pointer; font-size: 0.9rem;
+    border-radius: 6px; padding: 9px 13px; cursor: pointer; font-size: 0.88rem;
   }
-  .btn-icon:hover { border-color: var(--blue); }
-  .tabs { display: flex; gap: 6px; margin-bottom: 10px; }
-  .tabs button {
-    flex: 1; padding: 8px; border-radius: 8px; border: 1px solid var(--border);
-    background: var(--panel-2); color: var(--muted); font-size: 0.82rem; font-weight: 600; cursor: pointer;
-  }
-  .tabs button.active { color: var(--blue); border-color: var(--blue); background: rgba(74,144,217,.12); }
-  .empty-list { text-align: center; color: var(--muted); padding: 30px 10px; font-size: 0.85rem; }
+  .btn-icon:hover { border-color: var(--red); color: var(--red); }
+
   .toast {
     position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%);
-    background: var(--panel-2); border: 1px solid var(--border); color: var(--text);
-    padding: 12px 20px; border-radius: 10px; font-size: 0.9rem; opacity: 0;
-    transition: opacity .25s; pointer-events: none; z-index: 50; max-width: 90vw;
+    background: var(--panel-2); border: 1px solid var(--red); color: var(--text);
+    padding: 12px 20px; border-radius: 8px; font-size: 0.9rem; opacity: 0;
+    transition: opacity .25s; pointer-events: none; z-index: 60; max-width: 90vw;
   }
   .toast.show { opacity: 1; }
   #installBtn { display: none; }
-  footer { margin-top: 24px; font-size: 0.75rem; color: var(--muted); text-align: center; line-height: 1.6; }
+  footer { margin-top: 30px; font-size: 0.75rem; color: #555; text-align: center; line-height: 1.6; }
 </style>
 </head>
 <body>
 
 <div id="loginScreen">
   <div class="login-card">
-    <h1>📺 IPTV <span>Player</span></h1>
-    <div class="sub">Acesso restrito. Entre com seu usuário e chave.</div>
+    <div class="logo">Newflix<small>iptv player · acesso restrito</small></div>
+    <div class="sub">Entre com o usuário e a chave fornecidos pelo administrador.</div>
     <form id="loginForm">
       <label for="loginUsuario">Usuário</label>
       <input type="text" id="loginUsuario" autocomplete="username" required>
@@ -180,59 +198,60 @@
   </div>
 </div>
 
-<div class="container hidden" id="appRoot">
-  <header>
-    <h1>📺 IPTV <span>Player</span></h1>
-    <div class="header-right">
-      <span class="user-badge">👤 <b id="badgeUsuario"></b> <span id="badgeAdmin"></span></span>
-      <button class="btn" id="btnSair">Sair</button>
-      <button class="btn primary" id="installBtn">📲 Instalar app</button>
+<div class="hidden" id="appRoot">
+  <div class="topbar">
+    <div class="topbar-inner">
+      <div class="logo">Newflix</div>
+      <div class="header-right">
+        <span class="badge">👤 <b id="badgeUsuario"></b> <span id="badgeAdmin"></span></span>
+        <span class="badge timer hidden" id="badgeTimer"></span>
+        <button class="btn" id="btnSair">Sair</button>
+        <button class="btn primary" id="installBtn">📲 Instalar app</button>
+      </div>
     </div>
-  </header>
-
-  <div class="load-panel hidden" id="loadPanel">
-    <h2>Carregar lista de canais (M3U / M3U8) — admin</h2>
-    <div class="load-row">
-      <input type="text" id="playlistUrl" placeholder="URL da playlist (.m3u / .m3u8)">
-      <button class="btn primary" id="btnCarregarUrl">Carregar URL</button>
-      <button class="btn" id="btnAbrirArquivo">📁 Abrir arquivo</button>
-      <input type="file" id="arquivoPlaylist" accept=".m3u,.m3u8,text/plain" style="display:none">
-    </div>
-    <div class="load-status" id="loadStatus"></div>
   </div>
 
-  <div class="main-grid">
-    <div class="panel">
-      <h2>Canais <span id="chCount" style="color:var(--muted);font-weight:400;font-size:0.8rem"></span></h2>
+  <div class="container">
+    <div class="load-panel hidden" id="loadPanel">
+      <h2>Carregar lista de canais (M3U / M3U8) — admin</h2>
+      <div class="load-row">
+        <input type="text" id="playlistUrl" placeholder="URL da playlist (.m3u / .m3u8)">
+        <button class="btn primary" id="btnCarregarUrl">Carregar URL</button>
+        <button class="btn" id="btnAbrirArquivo">📁 Abrir arquivo</button>
+        <input type="file" id="arquivoPlaylist" accept=".m3u,.m3u8,text/plain" style="display:none">
+      </div>
+      <div class="load-status" id="loadStatus"></div>
+    </div>
+
+    <div class="controls-row">
       <div class="tabs">
         <button id="tabTodos" class="active">Todos</button>
         <button id="tabFavoritos">⭐ Favoritos</button>
         <button id="tabRecentes">🕐 Recentes</button>
       </div>
-      <div class="list-controls">
-        <input type="text" id="busca" placeholder="🔍 Buscar canal...">
-        <select id="filtroGrupo"><option value="todos">Todos os grupos</option></select>
-      </div>
-      <ul class="ch-list" id="chList"></ul>
+      <input type="text" id="busca" placeholder="🔍 Buscar canal...">
+      <select id="filtroGrupo"><option value="todos">Todos os grupos</option></select>
+      <span id="chCount"></span>
     </div>
 
-    <div class="panel player-panel">
-      <h2>Reprodução</h2>
+    <div class="ch-grid" id="chGrid"></div>
+
+    <div class="player-panel">
+      <div class="player-bar">
+        <span class="now" id="nowPlaying">Nenhum canal selecionado</span>
+        <span class="status" id="playStatus"></span>
+        <button class="btn-icon" id="btnStop">⏹ Parar</button>
+        <button class="btn-icon" id="btnFull">⛶ Tela cheia</button>
+      </div>
       <div class="video-wrap" id="videoWrap">
         <video id="video" controls playsinline autoplay></video>
-        <div class="placeholder" id="placeholder">Selecione um canal na lista ao lado 👈</div>
-      </div>
-      <div class="player-bar">
-        <span class="now" id="nowPlaying">Nenhum canal</span>
-        <span class="status" id="playStatus"></span>
-        <button class="btn-icon" id="btnStop" title="Parar">⏹ Parar</button>
-        <button class="btn-icon" id="btnFull" title="Tela cheia">⛶ Tela cheia</button>
+        <div class="placeholder" id="placeholder">Selecione um canal acima para começar a assistir 🍿</div>
       </div>
     </div>
   </div>
 
   <footer>
-    Acesso controlado · Este app reproduz apenas listas carregadas pelo administrador. Use somente fontes legais.
+    NEWFLIX · Acesso controlado por usuário e tempo · Reproduza apenas conteúdo legal
   </footer>
 </div>
 <div class="toast" id="toast"></div>
@@ -277,7 +296,9 @@
   var aba = 'todos';
   var hls = null;
   var canalAtual = null;
-  var ehAdmin = false;
+  var expiraEm = null;
+  var timerInterval = null;
+  var bloqueado = false;
 
   var video = document.getElementById('video');
   var placeholder = document.getElementById('placeholder');
@@ -303,6 +324,12 @@
     var el = document.getElementById('loginStatus');
     el.textContent = msg;
     el.className = cls || '';
+  }
+  function fmtTempo(ms) {
+    var s = Math.max(0, Math.floor(ms / 1000));
+    var h = Math.floor(s / 3600), m = Math.floor((s % 3600) / 60), seg = s % 60;
+    var txt = (h > 0 ? h + 'h ' : '') + (h > 0 || m > 0 ? m + 'min ' : '') + (h > 0 ? '' : seg + 's');
+    return txt.trim();
   }
 
   function parseM3U(texto) {
@@ -339,27 +366,40 @@
     });
   }
 
-  function carregarCanais(listas, rotulo) {
-    var promessas = listas.map(function (p) {
-      return baixar(p.url).then(function (txt) {
-        return { nome: p.nome, canais: parseM3U(txt) };
-      });
-    });
-    return Promise.all(promessas).then(function (resultados) {
-      var todos = [];
-      resultados.forEach(function (r) {
-        r.canais.forEach(function (c) {
-          c.grupo = r.nome + (c.grupo && c.grupo !== 'Sem grupo' ? ' · ' + c.grupo : '');
-          todos.push(c);
-        });
-      });
-      if (!todos.length) throw new Error('nenhum canal encontrado nas listas');
-      canais = todos;
-      preencherGrupos();
-      renderLista();
-      status('✅ ' + todos.length + ' canais carregados (' + rotulo + ').', 'ok');
-      toast('📺 ' + todos.length + ' canais carregados!');
-    });
+  function definirCanais(lista) {
+    canais = lista;
+    preencherGrupos();
+    renderGrid();
+  }
+
+  function bloquear(msg) {
+    bloqueado = true;
+    if (timerInterval) { clearInterval(timerInterval); timerInterval = null; }
+    limparHls();
+    video.pause();
+    sessionStorage.removeItem(SESSAO);
+    document.getElementById('appRoot').className = 'hidden';
+    document.getElementById('loginScreen').className = '';
+    document.getElementById('loginChave').value = '';
+    loginStatus('⛔ ' + msg, 'err');
+  }
+
+  function iniciarTimer() {
+    var badge = document.getElementById('badgeTimer');
+    if (!expiraEm) { badge.className = 'badge timer hidden'; return; }
+    badge.className = 'badge timer';
+    function tick() {
+      var restante = expiraEm - Date.now();
+      if (restante <= 0) {
+        bloquear('Seu tempo de acesso expirou. Fale com o administrador.');
+        return;
+      }
+      badge.textContent = '⏳ ' + fmtTempo(restante);
+      badge.className = 'badge timer' + (restante < 5 * 60000 ? ' warn' : '');
+    }
+    tick();
+    if (timerInterval) clearInterval(timerInterval);
+    timerInterval = setInterval(tick, 1000);
   }
 
   function entrar(usuario, chave, salvarSessao) {
@@ -373,16 +413,40 @@
     }
     return IptvCrypto.descriptografar(entrada, chave).then(function (texto) {
       var dados = JSON.parse(texto);
-      return carregarCanais(dados.playlists, 'usuário ' + usuario).then(function () {
-        ehAdmin = !!dados.admin;
+      if (dados.expiraEm && Date.now() > dados.expiraEm) {
+        throw new Error('EXPIRADO');
+      }
+      var base = (dados.canais || []).slice();
+      var promessaListas = Promise.resolve();
+      if (dados.admin && dados.playlists && dados.playlists.length) {
+        promessaListas = Promise.all(dados.playlists.map(function (p) {
+          return baixar(p.url).then(function (txt) {
+            return { nome: p.nome, canais: parseM3U(txt) };
+          }).catch(function () { return null; });
+        })).then(function (rs) {
+          rs.forEach(function (r) {
+            if (!r) return;
+            r.canais.forEach(function (c) {
+              c.grupo = r.nome + (c.grupo && c.grupo !== 'Sem grupo' ? ' · ' + c.grupo : '');
+              base.push(c);
+            });
+          });
+        });
+      }
+      return promessaListas.then(function () {
+        if (!base.length) throw new Error('SEM_CANAIS');
+        definirCanais(base);
+        expiraEm = dados.expiraEm || null;
         document.getElementById('badgeUsuario').textContent = usuario;
-        document.getElementById('badgeAdmin').textContent = ehAdmin ? '· admin' : '';
-        document.getElementById('loadPanel').className = 'load-panel' + (ehAdmin ? '' : ' hidden');
-        document.getElementById('appRoot').className = 'container';
+        document.getElementById('badgeAdmin').textContent = dados.admin ? '· admin' : '';
+        document.getElementById('loadPanel').className = 'load-panel' + (dados.admin ? '' : ' hidden');
+        document.getElementById('appRoot').className = '';
         document.getElementById('loginScreen').className = 'hidden';
+        iniciarTimer();
         if (salvarSessao) {
           sessionStorage.setItem(SESSAO, JSON.stringify({ usuario: usuario, chave: chave }));
         }
+        toast('📺 ' + base.length + ' canais liberados. Bom filme!');
       });
     });
   }
@@ -392,21 +456,28 @@
     var usuario = document.getElementById('loginUsuario').value.trim();
     var chave = document.getElementById('loginChave').value;
     var btn = document.getElementById('btnLogin');
-    if (!usuario || !chave) return;
+    if (!usuario || !chave || bloqueado) return;
     btn.disabled = true;
     loginStatus('⏳ Verificando acesso...');
     entrar(usuario, chave, true).catch(function (err) {
-      loginStatus('❌ ' + (err.message === 'Usuário não encontrado.' ? 'Usuário não encontrado.' : 'Chave incorreta ou lista indisponível.'), 'err');
+      if (err.message === 'EXPIRADO') {
+        loginStatus('⛔ Seu acesso expirou. Fale com o administrador.', 'err');
+      } else if (err.message === 'SEM_CANAIS') {
+        loginStatus('⛔ Nenhum canal liberado para este usuário.', 'err');
+      } else {
+        loginStatus('❌ Usuário ou chave incorretos.', 'err');
+      }
     }).then(function () { btn.disabled = false; });
   });
 
   document.getElementById('btnSair').addEventListener('click', function () {
     sessionStorage.removeItem(SESSAO);
+    if (timerInterval) { clearInterval(timerInterval); timerInterval = null; }
     limparHls();
     video.pause();
     placeholder.style.display = 'flex';
-    document.getElementById('nowPlaying').textContent = 'Nenhum canal';
-    document.getElementById('appRoot').className = 'container hidden';
+    document.getElementById('nowPlaying').textContent = 'Nenhum canal selecionado';
+    document.getElementById('appRoot').className = 'hidden';
     document.getElementById('loginScreen').className = '';
     document.getElementById('loginChave').value = '';
     loginStatus('');
@@ -431,8 +502,8 @@
       }).join('');
   }
 
-  function renderLista() {
-    var ul = document.getElementById('chList');
+  function renderGrid() {
+    var grid = document.getElementById('chGrid');
     var busca = document.getElementById('busca').value.toLowerCase().trim();
     var grupo = document.getElementById('filtroGrupo').value;
 
@@ -454,28 +525,28 @@
       return true;
     });
 
-    document.getElementById('chCount').textContent = '(' + filtrados.length + ')';
+    document.getElementById('chCount').textContent = filtrados.length + ' canais';
 
     if (!filtrados.length) {
       var msg = aba === 'favoritos' ? 'Nenhum favorito ainda — toque na ⭐ de um canal.'
         : aba === 'recentes' ? 'Nenhum canal assistido recentemente.'
-        : 'Nenhuma lista carregada.';
-      ul.innerHTML = '<li class="empty-list">' + msg + '</li>';
+        : 'Nenhum canal liberado.';
+      grid.innerHTML = '<div class="empty-list">' + msg + '</div>';
       return;
     }
 
-    ul.innerHTML = filtrados.map(function (c) {
+    grid.innerHTML = filtrados.map(function (c) {
       var fav = favoritos.indexOf(c.url) !== -1;
       var ativo = canalAtual && canalAtual.url === c.url;
-      var logo = c.logo
-        ? '<img src="' + esc(c.logo) + '" alt="" loading="lazy" onerror="this.parentNode.textContent=\'📺\'">'
-        : '📺';
-      return '<li class="ch' + (ativo ? ' active' : '') + '" data-url="' + esc(c.url) + '">' +
-        '<div class="logo">' + logo + '</div>' +
-        '<div class="info"><div class="name">' + esc(c.nome) + '</div>' +
-        '<div class="group">' + esc(c.grupo) + '</div></div>' +
+      var thumb = c.logo
+        ? '<img src="' + esc(c.logo) + '" alt="" loading="lazy" onerror="this.innerHTML=\'<span class=\\\'no-logo\\\'>📺</span>\'">'
+        : '<span class="no-logo">📺</span>';
+      return '<div class="ch-card' + (ativo ? ' active' : '') + '" data-url="' + esc(c.url) + '">' +
         '<button class="fav' + (fav ? ' on' : '') + '" data-fav="1" title="Favoritar">' + (fav ? '★' : '☆') + '</button>' +
-        '</li>';
+        '<div class="thumb">' + thumb + '</div>' +
+        '<div class="txt"><div class="name">' + esc(c.nome) + '</div>' +
+        '<div class="group">' + esc(c.grupo) + '</div></div>' +
+        '</div>';
     }).join('');
   }
 
@@ -507,7 +578,7 @@
 
     recentes = [canal.url].concat(recentes.filter(function (u) { return u !== canal.url; })).slice(0, 30);
     lsSet(LS.rec, recentes);
-    renderLista();
+    renderGrid();
   }
 
   function setStatus(msg, cls) {
@@ -522,16 +593,16 @@
     try { video.load(); } catch (e) {}
   }
 
-  document.getElementById('chList').addEventListener('click', function (e) {
+  document.getElementById('chGrid').addEventListener('click', function (e) {
     var favBtn = e.target.closest('.fav');
-    var li = e.target.closest('.ch');
-    if (!li) return;
-    var url = li.getAttribute('data-url');
+    var card = e.target.closest('.ch-card');
+    if (!card) return;
+    var url = card.getAttribute('data-url');
     if (favBtn) {
       var idx = favoritos.indexOf(url);
       if (idx === -1) favoritos.push(url); else favoritos.splice(idx, 1);
       lsSet(LS.favs, favoritos);
-      renderLista();
+      renderGrid();
       return;
     }
     var canal = null;
@@ -545,7 +616,13 @@
     var url = document.getElementById('playlistUrl').value.trim();
     if (!url) { status('Informe a URL da playlist.', 'err'); return; }
     status('⏳ Baixando lista...');
-    carregarCanais([{ nome: 'Lista', url: url }], 'URL do admin').catch(function (e) {
+    baixar(url).then(function (txt) {
+      var lista = parseM3U(txt);
+      if (!lista.length) throw new Error('nenhum canal encontrado');
+      lista.forEach(function (c) { c.grupo = 'Lista admin · ' + c.grupo; });
+      definirCanais(canais.concat(lista));
+      status('✅ ' + lista.length + ' canais carregados.', 'ok');
+    }).catch(function (e) {
       status('❌ Falha: ' + e.message + '. Se for bloqueio de CORS, baixe o arquivo e use "Abrir arquivo".', 'err');
     });
   });
@@ -564,24 +641,22 @@
       var lista = parseM3U(reader.result);
       if (!lista.length) { status('❌ Nenhum canal encontrado no arquivo.', 'err'); return; }
       lista.forEach(function (c) { c.grupo = 'Arquivo · ' + c.grupo; });
-      canais = canais.concat(lista);
-      preencherGrupos();
-      renderLista();
+      definirCanais(canais.concat(lista));
       status('✅ ' + lista.length + ' canais do arquivo ' + file.name + '.', 'ok');
     };
     reader.readAsText(file);
     e.target.value = '';
   });
 
-  document.getElementById('busca').addEventListener('input', renderLista);
-  document.getElementById('filtroGrupo').addEventListener('change', renderLista);
+  document.getElementById('busca').addEventListener('input', renderGrid);
+  document.getElementById('filtroGrupo').addEventListener('change', renderGrid);
 
   function setAba(nova) {
     aba = nova;
     document.getElementById('tabTodos').className = nova === 'todos' ? 'active' : '';
     document.getElementById('tabFavoritos').className = nova === 'favoritos' ? 'active' : '';
     document.getElementById('tabRecentes').className = nova === 'recentes' ? 'active' : '';
-    renderLista();
+    renderGrid();
   }
   document.getElementById('tabTodos').addEventListener('click', function () { setAba('todos'); });
   document.getElementById('tabFavoritos').addEventListener('click', function () { setAba('favoritos'); });
@@ -591,10 +666,10 @@
     limparHls();
     video.pause();
     placeholder.style.display = 'flex';
-    document.getElementById('nowPlaying').textContent = 'Nenhum canal';
+    document.getElementById('nowPlaying').textContent = 'Nenhum canal selecionado';
     setStatus('');
     canalAtual = null;
-    renderLista();
+    renderGrid();
   });
 
   document.getElementById('btnFull').addEventListener('click', function () {
@@ -606,7 +681,7 @@
   video.addEventListener('playing', function () { setStatus('▶ Reproduzindo', 'ok'); });
   video.addEventListener('waiting', function () { setStatus('⏳ Carregando...', ''); });
 
-  renderLista();
+  renderGrid();
 })();
 </script>
 </body>

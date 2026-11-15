@@ -1,4 +1,4 @@
-var CACHE_NAME = 'iptv-player-v2';
+var CACHE_NAME = 'newflix-v3';
 var ARQUIVOS = [
   './',
   './index.html',
