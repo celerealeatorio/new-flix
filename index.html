@@ -135,26 +135,11 @@
   }
 
   #busca {
-    width: 100%; padding: 13px 14px; margin-bottom: 12px;
+    width: 100%; padding: 13px 14px; margin: 10px 0 2px;
     background: var(--panel); border: 1px solid var(--border); border-radius: 8px;
     color: var(--text); font-size: 16px; outline: none;
   }
   #busca:focus { border-color: var(--red); }
-  .controls-row { display: flex; gap: 10px; margin-bottom: 16px; flex-wrap: wrap; align-items: center; }
-  .tabs { display: flex; gap: 6px; }
-  .tabs button {
-    padding: 9px 16px; border-radius: 6px; border: 1px solid var(--border);
-    background: var(--panel); color: var(--muted); font-size: 0.85rem; font-weight: 600; cursor: pointer;
-  }
-  .tabs button.active { color: #fff; border-color: var(--red); background: rgba(229,9,20,.15); }
-  .controls-row input[type=text], .controls-row select {
-    padding: 10px 12px; background: var(--panel); border: 1px solid var(--border);
-    border-radius: 6px; color: var(--text); font-size: 14px; outline: none;
-  }
-  .controls-row input[type=text] { flex: 1; min-width: 160px; }
-  .controls-row input[type=text]:focus { border-color: var(--red); }
-  .controls-row select { max-width: 180px; }
-  #chCount { color: var(--muted); font-size: 0.85rem; }
 
   .ch-grid {
     display: grid; grid-template-columns: repeat(auto-fill, minmax(170px, 1fr)); gap: 14px;
@@ -210,6 +195,7 @@
   }
   .bottombar button .ico { font-size: 1.15rem; }
   .bottombar button:hover { color: var(--red); }
+  .bottombar button.on { color: var(--red); }
   .bottombar .badge.timer { font-size: 0.68rem; padding: 4px 10px; }
 
   @media (max-width: 700px) {
@@ -218,7 +204,6 @@
     .ch-card .txt .name { font-size: 0.8rem; }
     .topbar-inner { padding: 10px 10px; }
     .btn { padding: 12px 14px; font-size: 0.9rem; }
-    .tabs button { padding: 11px 12px; }
     .video-wrap { max-height: none; border-radius: 0; border-left: 0; border-right: 0; aspect-ratio: 16 / 10; }
     .bottombar button { font-size: 0.58rem; padding: 4px 6px; }
     .bottombar button .ico { font-size: 1.05rem; }
@@ -260,18 +245,7 @@
         </div>
         <div class="play-status" id="playStatus"></div>
       </div>
-    </div>
-
-    <input type="text" id="busca" placeholder="🔍 Buscar canal..." autocomplete="off">
-
-    <div class="controls-row">
-      <div class="tabs">
-        <button id="tabTodos" class="active">Todos</button>
-        <button id="tabFavoritos">⭐ Favoritos</button>
-        <button id="tabRecentes">🕐 Recentes</button>
-      </div>
-      <select id="filtroGrupo"><option value="todos">Todos os grupos</option></select>
-      <span id="chCount"></span>
+      <input type="text" id="busca" placeholder="🔍 Buscar canal..." autocomplete="off">
     </div>
 
     <div class="ch-grid" id="chGrid"></div>
@@ -280,7 +254,7 @@
   <div class="bottombar">
     <span class="badge timer hidden" id="badgeTimer"></span>
     <button id="btnFilmes"><span class="ico">🎬</span>Filmes</button>
-    <button id="btnStop"><span class="ico">⏹</span>Parar</button>
+    <button id="btnFavoritos"><span class="ico">⭐</span>Favoritos</button>
     <button id="btnFull"><span class="ico">⛶</span>Tela cheia</button>
     <button id="btnCast" style="display:none"><span class="ico">📡</span>Transmitir</button>
     <button id="btnSair"><span class="ico">🚪</span>Sair</button>
@@ -331,7 +305,7 @@
   var canais = [];
   var favoritos = lsGet(LS.favs, []);
   var recentes = lsGet(LS.rec, []);
-  var aba = 'todos';
+  var soFavoritos = false;
   var hls = null;
   var canalAtual = null;
   var expiraEm = null;
@@ -402,7 +376,6 @@
 
   function definirCanais(lista) {
     canais = lista;
-    preencherGrupos();
     renderGrid();
   }
 
@@ -559,45 +532,21 @@
     });
   }
 
-  function preencherGrupos() {
-    var sel = document.getElementById('filtroGrupo');
-    var grupos = {};
-    canais.forEach(function (c) { grupos[c.grupo] = true; });
-    sel.innerHTML = '<option value="todos">Todos os grupos</option>' +
-      Object.keys(grupos).sort().map(function (g) {
-        return '<option value="' + esc(g) + '">' + esc(g) + '</option>';
-      }).join('');
-  }
-
   function renderGrid() {
     var grid = document.getElementById('chGrid');
     var busca = document.getElementById('busca').value.toLowerCase().trim();
-    var grupo = document.getElementById('filtroGrupo').value;
 
-    var base;
-    if (aba === 'favoritos') {
-      base = canais.filter(function (c) { return favoritos.indexOf(c.url) !== -1; });
-    } else if (aba === 'recentes') {
-      base = recentes.map(function (u) {
-        for (var i = 0; i < canais.length; i++) if (canais[i].url === u) return canais[i];
-        return null;
-      }).filter(Boolean);
-    } else {
-      base = canais;
-    }
+    var base = soFavoritos
+      ? canais.filter(function (c) { return favoritos.indexOf(c.url) !== -1; })
+      : canais;
 
     var filtrados = base.filter(function (c) {
-      if (grupo !== 'todos' && c.grupo !== grupo) return false;
       if (busca && c.nome.toLowerCase().indexOf(busca) === -1) return false;
       return true;
     });
 
-    document.getElementById('chCount').textContent = filtrados.length + ' canais';
-
     if (!filtrados.length) {
-      var msg = aba === 'favoritos' ? 'Nenhum favorito ainda — toque na ⭐ de um canal.'
-        : aba === 'recentes' ? 'Nenhum canal assistido recentemente.'
-        : 'Nenhum canal liberado.';
+      var msg = soFavoritos ? 'Nenhum favorito ainda — toque na ⭐ de um canal.' : 'Nenhum canal encontrado.';
       grid.innerHTML = '<div class="empty-list">' + msg + '</div>';
       return;
     }
@@ -711,26 +660,12 @@
   if ('ResizeObserver' in window) new ResizeObserver(medirTopbar).observe(topbar);
 
   document.getElementById('busca').addEventListener('input', renderGrid);
-  document.getElementById('filtroGrupo').addEventListener('change', renderGrid);
 
-  function setAba(nova) {
-    aba = nova;
-    document.getElementById('tabTodos').className = nova === 'todos' ? 'active' : '';
-    document.getElementById('tabFavoritos').className = nova === 'favoritos' ? 'active' : '';
-    document.getElementById('tabRecentes').className = nova === 'recentes' ? 'active' : '';
+  document.getElementById('btnFavoritos').addEventListener('click', function () {
+    soFavoritos = !soFavoritos;
+    this.className = soFavoritos ? 'on' : '';
     renderGrid();
-  }
-  document.getElementById('tabTodos').addEventListener('click', function () { setAba('todos'); });
-  document.getElementById('tabFavoritos').addEventListener('click', function () { setAba('favoritos'); });
-  document.getElementById('tabRecentes').addEventListener('click', function () { setAba('recentes'); });
-
-  document.getElementById('btnStop').addEventListener('click', function () {
-    limparPlayer();
-    video.pause();
-    placeholder.style.display = 'flex';
-    setStatus('');
-    canalAtual = null;
-    renderGrid();
+    toast(soFavoritos ? '⭐ Mostrando só os favoritos' : 'Mostrando todos os canais');
   });
 
   if ('remote' in video && 'RemotePlayback' in window) {

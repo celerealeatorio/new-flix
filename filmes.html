@@ -28,14 +28,6 @@
   .container { max-width: 1400px; margin: 0 auto; padding: 18px 16px 60px; }
   .section-title { font-size: 1.05rem; font-weight: 700; margin: 22px 0 4px; }
   .section-sub { font-size: 0.8rem; color: var(--muted); margin-bottom: 14px; }
-  .plat-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 14px; }
-  .plat {
-    background: var(--panel); border: 1px solid var(--border); border-left: 3px solid var(--red);
-    border-radius: 8px; padding: 18px; cursor: pointer; transition: transform .15s, border-color .15s;
-  }
-  .plat:hover { transform: scale(1.03); border-color: var(--red); }
-  .plat h3 { font-size: 1rem; margin-bottom: 6px; }
-  .plat p { font-size: 0.78rem; color: var(--muted); line-height: 1.5; }
   .chips { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 16px; }
   .chip {
     padding: 9px 16px; border-radius: 20px; border: 1px solid var(--border);
@@ -80,25 +72,8 @@
 </div>
 
 <div class="container">
-  <div class="section-title">Plataformas legais e gratuitas (com anúncios)</div>
-  <div class="section-sub">Filmes atualizados, 100% legais e grátis — abrem em nova aba/app:</div>
-  <div class="plat-grid">
-    <div class="plat" data-url="https://pluto.tv/br">
-      <h3>🪐 Pluto TV</h3>
-      <p>Grátis e legal (Paramount). Filmes, séries e canais ao vivo no Brasil, com anúncios.</p>
-    </div>
-    <div class="plat" data-url="https://tubitv.com">
-      <h3>🎬 Tubi</h3>
-      <p>Grande catálogo gratuito de filmes com anúncios (Fox/Paramount). Verifique disponibilidade na sua região.</p>
-    </div>
-    <div class="plat" data-url="https://www.youtube.com/movies">
-      <h3>▶️ YouTube Filmes</h3>
-      <p>Seção "Grátis com anúncios" do YouTube, com filmes completos e legais.</p>
-    </div>
-  </div>
-
-  <div class="section-title">Clássicos gratuitos — domínio público (Internet Archive)</div>
-  <div class="section-sub">Assista aqui mesmo, via nuvem: filmes clássicos em domínio público, 100% legais.</div>
+  <div class="section-title">Filmes na nuvem — assista aqui mesmo</div>
+  <div class="section-sub">Toque na capa para assistir. 100% legal e gratuito (domínio público).</div>
   <div class="chips" id="chips">
     <button class="chip active" data-q="collection:(feature_films)">🎬 Clássicos</button>
     <button class="chip" data-q="collection:(film_noir)">🕵️ Film Noir</button>
@@ -119,7 +94,6 @@
 </div>
 
 <footer>
-  Filmes recentes de estúdio gratuitos só existem em plataformas legais com anúncios (Pluto TV, Tubi, YouTube).
   Filmes em domínio público podem ser distribuídos livremente. Não hospedamos nem indexamos conteúdo pirata.
 </footer>
 
@@ -208,11 +182,6 @@
     }
   });
 
-  Array.prototype.forEach.call(document.querySelectorAll('.plat'), function (p) {
-    p.addEventListener('click', function () {
-      window.open(p.getAttribute('data-url'), '_blank', 'noopener');
-    });
-  });
 
   carregar();
 })();
