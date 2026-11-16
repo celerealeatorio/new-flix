@@ -67,7 +67,6 @@
   }
   .topbar .logo { font-size: 1.25rem; }
   .topbar .logo small { display: none; }
-  .header-right { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
   .badge {
     font-size: 0.78rem; color: var(--muted); background: var(--panel); border: 1px solid var(--border);
     padding: 7px 12px; border-radius: 20px;
@@ -130,6 +129,12 @@
     position: absolute; inset: 0; width: 100%; height: 100%; border: 0; display: none;
   }
 
+  #busca {
+    width: 100%; padding: 13px 14px; margin-bottom: 12px;
+    background: var(--panel); border: 1px solid var(--border); border-radius: 8px;
+    color: var(--text); font-size: 16px; outline: none;
+  }
+  #busca:focus { border-color: var(--red); }
   .controls-row { display: flex; gap: 10px; margin-bottom: 16px; flex-wrap: wrap; align-items: center; }
   .tabs { display: flex; gap: 6px; }
   .tabs button {
@@ -220,13 +225,6 @@
   <div class="topbar">
     <div class="topbar-inner">
       <div class="logo">Newflix</div>
-      <div class="header-right">
-        <span class="badge">👤 <b id="badgeUsuario"></b> <span id="badgeAdmin"></span></span>
-        <span class="badge timer hidden" id="badgeTimer"></span>
-        <button class="btn primary" id="btnFilmes">🎬 Filmes</button>
-        <button class="btn" id="btnSair">Sair</button>
-        <button class="btn primary" id="installBtn">📲 Instalar app</button>
-      </div>
     </div>
   </div>
 
@@ -235,9 +233,13 @@
       <div class="player-bar">
         <span class="now" id="nowPlaying">Nenhum canal selecionado</span>
         <span class="status" id="playStatus"></span>
-        <button class="btn-icon" id="btnCast" style="display:none" title="Transmitir para TV (Chromecast)">📡 Transmitir</button>
+        <span class="badge timer hidden" id="badgeTimer"></span>
+        <span class="badge">👤 <b id="badgeUsuario"></b> <span id="badgeAdmin"></span></span>
+        <button class="btn primary" id="btnFilmes">🎬 Filmes</button>
         <button class="btn-icon" id="btnStop">⏹ Parar</button>
         <button class="btn-icon" id="btnFull">⛶ Tela cheia</button>
+        <button class="btn" id="btnSair">Sair</button>
+        <button class="btn primary" id="installBtn">📲 Instalar app</button>
       </div>
       <div class="video-wrap" id="videoWrap">
         <video id="video" controls playsinline autoplay></video>
@@ -246,13 +248,14 @@
       </div>
     </div>
 
+    <input type="text" id="busca" placeholder="🔍 Buscar canal..." autocomplete="off">
+
     <div class="controls-row">
       <div class="tabs">
         <button id="tabTodos" class="active">Todos</button>
         <button id="tabFavoritos">⭐ Favoritos</button>
         <button id="tabRecentes">🕐 Recentes</button>
       </div>
-      <input type="text" id="busca" placeholder="🔍 Buscar canal...">
       <select id="filtroGrupo"><option value="todos">Todos os grupos</option></select>
       <span id="chCount"></span>
     </div>
@@ -314,7 +317,6 @@
   var video = document.getElementById('video');
   var ytFrame = document.getElementById('ytFrame');
   var placeholder = document.getElementById('placeholder');
-  var btnCast = document.getElementById('btnCast');
 
   function esc(s) {
     return String(s).replace(/[&<>"']/g, function (c) {
@@ -652,24 +654,6 @@
     ytFrame.src = '';
     ytFrame.style.display = 'none';
     video.style.display = 'block';
-  }
-
-  if ('remote' in video) {
-    btnCast.style.display = 'inline-block';
-    btnCast.addEventListener('click', function () {
-      if (isYouTube(canalAtual ? canalAtual.url : '')) {
-        toast('📡 Use o botão de transmitir dentro do próprio player do YouTube.');
-        return;
-      }
-      try {
-        video.remote.prompt();
-      } catch (e) {
-        toast('Nenhum dispositivo Chromecast encontrado na rede.');
-      }
-    });
-    video.remote.watchAvailability(function (avail) {
-      btnCast.style.opacity = avail ? '1' : '.5';
-    }).catch(function () {});
   }
 
   document.getElementById('chGrid').addEventListener('click', function (e) {
