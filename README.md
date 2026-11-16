@@ -12,15 +12,6 @@ Player de IPTV estilo Netflix (tema preto, linhas vermelhas) com **login por usu
 - 📲 Instalável no Android (PWA), interface funciona offline
 - 🔒 Links das playlists **criptografados com AES-256-GCM** — nunca aparecem legíveis no repositório
 
-## Fluxo do administrador
-
-1. Abra **`admin.html`** (pode ser local; não indexado)
-2. **Seção 1 — Catálogo:** importe listas M3U (URL ou arquivo) e/ou adicione canais manuais. O catálogo fica salvo **no seu navegador** — os links nunca vão para o GitHub
-3. **Seção 2 — Usuário:** defina login, chave, marque os canais liberados e o tempo (♾️ ilimitado ou ⏳ minutos, contando da geração)
-4. **Seção 4 — Publicação automática:** salve um token do GitHub (fine-grained, só no repo new-flix, permissão Contents: Read and write) uma única vez — a partir daí cada usuário gerado é **publicado sozinho no GitHub**, sem copiar e colar
-5. **Link de convite:** botão 🔗 no usuário copia um link que instala o usuário direto no app da pessoa (sem editar nada no GitHub)
-6. **Renovar acesso:** gere o usuário de novo (mesma chave). **Revogar:** 🗑️ no usuário — a exclusão é publicada automaticamente
-
 ## Fluxo do usuário
 
 1. Abra o app (ou instale pelo Chrome: "📲 Instalar app")
