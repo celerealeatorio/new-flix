@@ -226,10 +226,14 @@
 
   @media (min-width: 701px) {
     .container {
-      display: grid; grid-template-columns: minmax(0, 1.7fr) minmax(0, 1fr);
+      display: grid; grid-template-columns: minmax(0, 2.6fr) minmax(0, 1fr);
       gap: 18px; align-items: start;
     }
     .player-panel { position: sticky; }
+    .video-wrap {
+      aspect-ratio: auto; max-height: none;
+      height: calc(100vh - var(--topbar-h, 60px) - 130px);
+    }
     .ch-grid {
       max-height: calc(100vh - var(--topbar-h, 60px) - 30px);
       overflow-y: auto; padding-right: 4px;

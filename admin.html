@@ -198,6 +198,7 @@
     <div class="btn-row" style="margin-top:6px">
       <input type="password" id="ghToken" placeholder="Token do GitHub (salvo apenas neste navegador)" style="flex:1;min-width:220px">
       <button class="btn primary" id="btnSalvarToken">Salvar token</button>
+      <button class="btn" id="btnAtualizarTodos">🔄 Atualizar canais de todos</button>
       <button class="btn" id="btnPublicarAgora">🚀 Publicar agora</button>
       <button class="btn" id="btnAbrirGitHub">🐙 Abrir usuarios.js no GitHub</button>
     </div>
@@ -282,6 +283,12 @@
     st.className = 'status' + (cls ? ' ' + cls : '');
   }
 
+  function entradasPublicaveis() {
+    return entradas.map(function (e) {
+      return { usuario: e.usuario, salt: e.salt, iv: e.iv, dados: e.dados };
+    });
+  }
+
   function publicar(mensagem) {
     if (!ghToken()) {
       pubStatus('⚠️ Token do GitHub não salvo — salve o token acima ou publique manualmente (🐙 + colar).', 'err');
@@ -289,7 +296,7 @@
     }
     pubStatus('⏳ Publicando no GitHub...', '');
     var conteudo = entradas.length
-      ? 'window.USUARIOS = ' + JSON.stringify(entradas, null, 2) + ';\n'
+      ? 'window.USUARIOS = ' + JSON.stringify(entradasPublicaveis(), null, 2) + ';\n'
       : 'window.USUARIOS = [];\n';
     return fetch('https://api.github.com/repos/' + GH.repo + '/contents/' + GH.path, {
       headers: { 'Authorization': 'Bearer ' + ghToken(), 'Accept': 'application/vnd.github+json' }
@@ -603,7 +610,7 @@
     st.className = 'status';
     IptvCrypto.criptografar(JSON.stringify(payload), chave).then(function (enc) {
       entradas = entradas.filter(function (e) { return e.usuario.toLowerCase() !== usuario.toLowerCase(); });
-      entradas.push({ usuario: usuario, salt: enc.salt, iv: enc.iv, dados: enc.dados });
+      entradas.push({ usuario: usuario, salt: enc.salt, iv: enc.iv, dados: enc.dados, chave: chave });
       entradas.sort(function (a, b) { return a.usuario.localeCompare(b.usuario); });
       salvarEntradas();
       var tempo = tipo === 'minutos' ? minutos + ' minuto(s)' : 'ilimitado';
@@ -661,7 +668,7 @@
 
   function atualizarSaida() {
     document.getElementById('saida').value = entradas.length
-      ? 'window.USUARIOS = ' + JSON.stringify(entradas, null, 2) + ';\n'
+      ? 'window.USUARIOS = ' + JSON.stringify(entradasPublicaveis(), null, 2) + ';\n'
       : '';
   }
 
@@ -704,6 +711,42 @@
 
   document.getElementById('btnPublicarAgora').addEventListener('click', function () {
     publicar('Atualizar usuarios.js (painel admin)').catch(function () {});
+  });
+
+  document.getElementById('btnAtualizarTodos').addEventListener('click', function () {
+    var st = document.getElementById('gerStatus');
+    if (!entradas.length) { st.textContent = '\u274c Nenhum usu\u00e1rio gerado.'; st.className = 'status err'; return; }
+    var nomes = {};
+    todosCanais().forEach(function (c) { if (!nomes[c.nome]) nomes[c.nome] = c; });
+    var semChave = entradas.filter(function (e) { return !e.chave; }).map(function (e) { return e.usuario; });
+    var feitos = 0, falhas = [];
+    st.textContent = '\u23f3 Atualizando canais de todos os usu\u00e1rios (pode levar alguns segundos)...';
+    st.className = 'status';
+    var chain = Promise.resolve();
+    entradas.forEach(function (e) {
+      chain = chain.then(function () {
+        if (!e.chave) return Promise.resolve();
+        return IptvCrypto.descriptografar(e, e.chave).then(function (txt) {
+          var payload = JSON.parse(txt);
+          payload.canais = (payload.canais || []).map(function (c) { return nomes[c.nome] || c; });
+          return IptvCrypto.criptografar(JSON.stringify(payload), e.chave).then(function (enc) {
+            e.salt = enc.salt; e.iv = enc.iv; e.dados = enc.dados;
+            feitos++;
+          });
+        }).catch(function () { falhas.push(e.usuario); });
+      });
+    });
+    chain.then(function () {
+      salvarEntradas();
+      var msg = '\u2705 ' + feitos + ' usu\u00e1rio(s) atualizado(s) com as vers\u00f5es atuais dos canais do cat\u00e1logo.';
+      if (falhas.length) msg += ' Erro ao atualizar: ' + falhas.join(', ') + '.';
+      if (semChave.length) msg += ' Sem chave salva neste navegador (regenere manualmente): ' + semChave.join(', ') + '.';
+      st.textContent = msg;
+      st.className = 'status ok';
+      if (ghToken() && feitos) {
+        publicar('Atualizar canais de todos os usu\u00e1rios (painel admin)').catch(function () {});
+      }
+    });
   });
 
   document.getElementById('btnAbrirGitHub').addEventListener('click', function () {
