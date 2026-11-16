@@ -135,6 +135,16 @@
   .player-tools select option { background: #141414; }
   .player-tools button:hover, .player-tools select:hover { border-color: var(--red); }
   .video-wrap video { width: 100%; height: 100%; background: #000; object-fit: contain; }
+  .video-wrap #plutoFrame { display: none; width: 100%; height: 100%; border: 0; background: #000; }
+  .video-wrap.pluto #plutoFrame { display: block; }
+  .video-wrap.pluto video, .video-wrap.pluto #ytFrame { display: none !important; }
+  .pluto-aba {
+    display: none; position: absolute; right: 10px; bottom: 10px; z-index: 6;
+    color: #ddd; background: rgba(0,0,0,.65); border: 1px solid #333; border-radius: 6px;
+    padding: 4px 10px; font-size: 0.72rem; text-decoration: none;
+  }
+  .pluto-aba:hover { color: #fff; border-color: #e50914; }
+  .video-wrap.pluto .pluto-aba { display: inline-block; }
   .video-wrap .placeholder {
     display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px;
     background: radial-gradient(ellipse at 50% 40%, rgba(229,9,20,.16), transparent 65%), #000;
@@ -270,6 +280,8 @@
       <div class="video-wrap" id="videoWrap">
         <video id="video" controls playsinline autoplay></video>
         <iframe id="ytFrame" allow="autoplay; encrypted-media; picture-in-picture" allowfullscreen></iframe>
+        <iframe id="plutoFrame" allow="autoplay; encrypted-media; fullscreen" allowfullscreen></iframe>
+        <a id="plutoAba" class="pluto-aba" href="https://pluto.tv/br/live-tv" target="_blank" rel="noopener">Abrir Pluto TV em nova aba ↗</a>
         <div class="placeholder" id="placeholder">
           <div class="idle-logo">Newflix</div>
           <div class="idle-sub">IPTV ao vivo</div>
@@ -377,6 +389,7 @@
 
   var video = document.getElementById('video');
   var ytFrame = document.getElementById('ytFrame');
+  var plutoFrame = document.getElementById('plutoFrame');
   var placeholder = document.getElementById('placeholder');
 
   function esc(s) {
@@ -438,7 +451,8 @@
   }
 
   function definirCanais(lista) {
-    canais = lista;
+    canais = (lista || []).filter(function (c) { return !isPluto(c.url); });
+    canais.push({ nome: 'Pluto TV ao vivo', logo: '', grupo: '\u2b50 Oficial \u00b7 Gr\u00e1tis', url: 'pl:br' });
     renderGrid();
   }
 
@@ -533,7 +547,6 @@
         });
       }
       return promessaListas.then(function () {
-        if (!base.length) throw new Error('SEM_CANAIS');
         definirCanais(base);
         expiraEm = dados.expiraEm || null;
         document.getElementById('appRoot').className = '';
@@ -630,6 +643,7 @@
   }
 
   function isYouTube(url) { return /^yt:/i.test(url); }
+  function isPluto(url) { return /^pl:/i.test(url); }
   function ytEmbed(url) {
     var ch = url.replace(/^yt:/i, '');
     return 'https://www.youtube.com/embed/live_stream?channel=' + encodeURIComponent(ch) + '&autoplay=1';
@@ -650,7 +664,14 @@
 
     var url = canal.url;
 
-    if (isYouTube(url)) {
+    if (isPluto(url)) {
+      video.style.display = 'none';
+      ytFrame.style.display = 'none';
+      plutoFrame.src = 'https://pluto.tv/br/live-tv';
+      document.getElementById('videoWrap').classList.add('pluto');
+      document.getElementById('videoWrap').classList.remove('playing');
+      setStatus('▶ Pluto TV — escolha um canal no player oficial (grátis)', 'ok');
+    } else if (isYouTube(url)) {
       video.style.display = 'none';
       ytFrame.style.display = 'block';
       ytFrame.src = ytEmbed(url);
@@ -705,6 +726,8 @@
     try { video.load(); } catch (e) {}
     ytFrame.src = '';
     ytFrame.style.display = 'none';
+    plutoFrame.src = 'about:blank';
+    document.getElementById('videoWrap').classList.remove('pluto');
     video.style.display = 'block';
     video.playbackRate = 1;
     document.getElementById('videoWrap').classList.remove('playing');
@@ -777,8 +800,9 @@
     var btnCast = document.getElementById('btnCast');
     btnCast.style.display = 'flex';
     btnCast.addEventListener('click', function () {
-      if (isYouTube(canalAtual ? canalAtual.url : '')) {
-        toast('📡 Para canais do YouTube, use o botão de transmitir dentro do próprio player.');
+      var cu = canalAtual ? canalAtual.url : '';
+      if (isYouTube(cu) || isPluto(cu)) {
+        toast('📡 Para este canal, use o botão de transmitir dentro do próprio player.');
         return;
       }
       try {
@@ -791,6 +815,10 @@
 
   document.getElementById('btnFull').addEventListener('click', function () {
     var wrap = document.getElementById('videoWrap');
+    if (isPluto(canalAtual ? canalAtual.url : '')) {
+      if (plutoFrame.requestFullscreen) plutoFrame.requestFullscreen();
+      return;
+    }
     if (isYouTube(canalAtual ? canalAtual.url : '')) {
       if (ytFrame.requestFullscreen) ytFrame.requestFullscreen();
       return;
