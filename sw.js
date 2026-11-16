@@ -1,4 +1,4 @@
-var CACHE_NAME = 'newflix-v20';
+var CACHE_NAME = 'newflix-v21';
 var ARQUIVOS = [
   './',
   './index.html',
