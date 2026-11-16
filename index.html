@@ -106,6 +106,7 @@
     position: sticky; top: calc(var(--topbar-h, 60px)); z-index: 30;
     background: var(--bg); margin-bottom: 14px; padding-top: 4px;
   }
+  .video-wrap { transition: max-height .25s ease, height .25s ease; }
   .play-status {
     position: absolute; left: 10px; bottom: 10px; z-index: 5;
     background: rgba(0,0,0,.7); color: var(--muted); font-size: 0.72rem;
@@ -116,8 +117,15 @@
   .video-wrap {
     position: relative; background: #000; border-radius: 10px; overflow: hidden;
     aspect-ratio: 16 / 9; display: flex; align-items: center; justify-content: center;
-    border: 1px solid var(--border); max-height: 72vh;
+    border: 1px solid var(--border); max-height: 80vh;
   }
+  .player-panel.mini .video-wrap { aspect-ratio: auto; height: 170px; max-height: 170px; }
+  .mini-toggle {
+    position: absolute; top: 8px; right: 8px; z-index: 6;
+    background: rgba(0,0,0,.7); border: 1px solid var(--border); color: var(--text);
+    border-radius: 6px; min-width: 38px; height: 32px; cursor: pointer; font-size: 0.95rem;
+  }
+  .mini-toggle:hover { border-color: var(--red); color: var(--red); }
   .video-wrap video { width: 100%; height: 100%; background: #000; }
   .video-wrap .placeholder {
     display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px;
@@ -204,7 +212,8 @@
     .ch-card .txt .name { font-size: 0.8rem; }
     .topbar-inner { padding: 10px 10px; }
     .btn { padding: 12px 14px; font-size: 0.9rem; }
-    .video-wrap { max-height: none; border-radius: 0; border-left: 0; border-right: 0; aspect-ratio: 16 / 10; }
+    .video-wrap { max-height: none; border-radius: 0; border-left: 0; border-right: 0; aspect-ratio: 16 / 11; }
+    .player-panel.mini .video-wrap { height: 140px; max-height: 140px; }
     .bottombar button { font-size: 0.58rem; padding: 4px 6px; }
     .bottombar button .ico { font-size: 1.05rem; }
   }
@@ -244,6 +253,7 @@
           <div class="idle-sub">IPTV ao vivo</div>
         </div>
         <div class="play-status" id="playStatus"></div>
+        <button class="mini-toggle" id="btnMini" title="Minimizar / ampliar player">⬆</button>
       </div>
       <input type="text" id="busca" placeholder="🔍 Buscar canal..." autocomplete="off">
     </div>
@@ -658,6 +668,23 @@
   }
   window.addEventListener('resize', medirTopbar);
   if ('ResizeObserver' in window) new ResizeObserver(medirTopbar).observe(topbar);
+
+  var playerPanel = document.querySelector('.player-panel');
+  var btnMini = document.getElementById('btnMini');
+  function setMini(on) {
+    playerPanel.className = 'player-panel' + (on ? ' mini' : '');
+    btnMini.textContent = on ? '⬇' : '⬆';
+  }
+  btnMini.addEventListener('click', function () {
+    setMini(playerPanel.className.indexOf('mini') === -1);
+  });
+  var ultimoScroll = 0;
+  window.addEventListener('scroll', function () {
+    var y = window.pageYOffset || document.documentElement.scrollTop;
+    if (y > 320 && y > ultimoScroll) setMini(true);
+    else if (y < 60) setMini(false);
+    ultimoScroll = y;
+  }, { passive: true });
 
   document.getElementById('busca').addEventListener('input', renderGrid);
 
