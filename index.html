@@ -126,6 +126,14 @@
     border-radius: 6px; min-width: 38px; height: 32px; cursor: pointer; font-size: 0.95rem;
   }
   .mini-toggle:hover { border-color: var(--red); color: var(--red); }
+  .player-tools { position: absolute; top: 8px; left: 8px; z-index: 6; display: none; gap: 6px; }
+  .video-wrap.playing .player-tools { display: flex; }
+  .player-tools select, .player-tools button {
+    background: rgba(0,0,0,.7); border: 1px solid var(--border); color: var(--text);
+    border-radius: 6px; padding: 5px 8px; font-size: 0.75rem; cursor: pointer; outline: none;
+  }
+  .player-tools select option { background: #141414; }
+  .player-tools button:hover, .player-tools select:hover { border-color: var(--red); }
   .video-wrap video { width: 100%; height: 100%; background: #000; object-fit: contain; }
   .video-wrap .placeholder {
     display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px;
@@ -267,6 +275,18 @@
           <div class="idle-sub">IPTV ao vivo</div>
         </div>
         <div class="play-status" id="playStatus"></div>
+        <div class="player-tools" id="playerTools">
+          <select id="selQualidade" title="Qualidade"><option value="-1">Auto</option></select>
+          <select id="selVelocidade" title="Velocidade">
+            <option value="1">1x</option>
+            <option value="0.5">0.5x</option>
+            <option value="0.75">0.75x</option>
+            <option value="1.25">1.25x</option>
+            <option value="1.5">1.5x</option>
+            <option value="2">2x</option>
+          </select>
+          <button id="btnPip" title="Vídeo flutuante (PiP)">🗗</button>
+        </div>
         <button class="mini-toggle" id="btnMini" title="Minimizar / ampliar player">⬆</button>
       </div>
       <input type="text" id="busca" placeholder="🔍 Buscar canal..." autocomplete="off">
@@ -634,14 +654,27 @@
       video.style.display = 'none';
       ytFrame.style.display = 'block';
       ytFrame.src = ytEmbed(url);
+      document.getElementById('videoWrap').classList.remove('playing');
       setStatus('▶ Reproduzindo (YouTube oficial)', 'ok');
     } else {
       video.style.display = 'block';
+      document.getElementById('videoWrap').classList.add('playing');
       var isHls = /\.m3u8(\?|$)/i.test(url) || /m3u8/i.test(url);
       if (isHls && window.Hls && Hls.isSupported()) {
         hls = new Hls({ manifestLoadingTimeOut: 15000, manifestLoadingMaxRetry: 2 });
         hls.loadSource(url);
         hls.attachMedia(video);
+        hls.on(Hls.Events.MANIFEST_PARSED, function () {
+          var sel = document.getElementById('selQualidade');
+          var opts = '<option value="-1">Auto</option>';
+          var vistos = {};
+          (hls.levels || []).forEach(function (l, i) {
+            var rot = l.height ? l.height + 'p' : (l.bitrate ? Math.round(l.bitrate / 1000) + 'kbps' : '');
+            if (rot && !vistos[rot]) { vistos[rot] = true; opts += '<option value="' + i + '">' + rot + '</option>'; }
+          });
+          if (hls.levels && hls.levels.length > 1) sel.innerHTML = opts;
+          else sel.innerHTML = '<option value="-1">Auto</option>';
+        });
         hls.on(Hls.Events.ERROR, function (evt, data) {
           if (data && data.fatal) {
             setStatus('Erro ao reproduzir (stream indisponível ou bloqueado).', 'err');
@@ -673,6 +706,9 @@
     ytFrame.src = '';
     ytFrame.style.display = 'none';
     video.style.display = 'block';
+    video.playbackRate = 1;
+    document.getElementById('videoWrap').classList.remove('playing');
+    document.getElementById('selQualidade').innerHTML = '<option value="-1">Auto</option>';
   }
 
   document.getElementById('chGrid').addEventListener('click', function (e) {
@@ -701,6 +737,22 @@
   }
   window.addEventListener('resize', medirTopbar);
   if ('ResizeObserver' in window) new ResizeObserver(medirTopbar).observe(topbar);
+
+  document.getElementById('selQualidade').addEventListener('change', function () {
+    if (hls) hls.currentLevel = Number(this.value);
+  });
+  document.getElementById('selVelocidade').addEventListener('change', function () {
+    video.playbackRate = Number(this.value);
+  });
+  document.getElementById('btnPip').addEventListener('click', function () {
+    if (document.pictureInPictureElement) {
+      document.exitPictureInPicture().catch(function () {});
+    } else if (video.requestPictureInPicture) {
+      video.requestPictureInPicture().catch(function () { toast('PiP não disponível para este vídeo.'); });
+    } else {
+      toast('PiP não suportado neste navegador.');
+    }
+  });
 
   var playerPanel = document.querySelector('.player-panel');
   var btnMini = document.getElementById('btnMini');
