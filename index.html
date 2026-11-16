@@ -117,7 +117,7 @@
   .video-wrap {
     position: relative; background: #000; border-radius: 10px; overflow: hidden;
     aspect-ratio: 16 / 9; display: flex; align-items: center; justify-content: center;
-    border: 1px solid var(--border); max-height: 80vh;
+    border: 1px solid var(--border); max-height: 60vh;
   }
   .player-panel.mini .video-wrap { aspect-ratio: auto; height: 170px; max-height: 170px; }
   .mini-toggle {
@@ -206,6 +206,20 @@
   .bottombar button.on { color: var(--red); }
   .bottombar .badge.timer { font-size: 0.68rem; padding: 4px 10px; }
 
+  @media (min-width: 701px) {
+    .container {
+      display: grid; grid-template-columns: minmax(0, 1.7fr) minmax(0, 1fr);
+      gap: 18px; align-items: start;
+    }
+    .player-panel { position: sticky; }
+    .ch-grid {
+      max-height: calc(100vh - var(--topbar-h, 60px) - 30px);
+      overflow-y: auto; padding-right: 4px;
+    }
+    .ch-grid::-webkit-scrollbar { width: 8px; }
+    .ch-grid::-webkit-scrollbar-thumb { background: #333; border-radius: 4px; }
+  }
+
   @media (max-width: 700px) {
     .container { padding: 10px 10px 90px; }
     .ch-grid { grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 10px; }
@@ -267,6 +281,7 @@
     <button id="btnFavoritos"><span class="ico">⭐</span>Favoritos</button>
     <button id="btnFull"><span class="ico">⛶</span>Tela cheia</button>
     <button id="btnCast" style="display:none"><span class="ico">📡</span>Transmitir</button>
+    <button id="btnAtualizar"><span class="ico">🔄</span>Atualizar</button>
     <button id="btnSair"><span class="ico">🚪</span>Sair</button>
     <button id="installBtn" style="display:none"><span class="ico">📲</span>Instalar</button>
   </div>
@@ -287,7 +302,25 @@
 
   if ('serviceWorker' in navigator) {
     navigator.serviceWorker.register('sw.js').catch(function () {});
+    if (navigator.serviceWorker.controller) {
+      navigator.serviceWorker.addEventListener('controllerchange', function () {
+        location.reload();
+      });
+    }
   }
+
+  document.getElementById('btnAtualizar').addEventListener('click', function () {
+    toast('⏳ Buscando atualizações...');
+    if (!('serviceWorker' in navigator)) { location.reload(); return; }
+    navigator.serviceWorker.getRegistration().then(function (reg) {
+      if (reg) {
+        reg.update().catch(function () {});
+        setTimeout(function () { location.reload(); }, 1200);
+      } else {
+        location.reload();
+      }
+    }).catch(function () { location.reload(); });
+  });
 
   var deferredPrompt = null;
   var installBtn = document.getElementById('installBtn');
