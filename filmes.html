@@ -66,7 +66,6 @@
     <div class="logo">Newflix Filmes</div>
     <div class="header-right">
       <input type="text" id="busca" placeholder="🔍 Buscar filme..." style="padding:10px 12px;background:var(--panel-2);border:1px solid var(--border);border-radius:6px;color:var(--text);font-size:14px;outline:none;flex:1;min-width:150px">
-      <button class="btn" onclick="window.location.href='onde-assistir.html'">🔎 Onde assistir (novidades)</button>
       <button class="btn" onclick="window.location.href='index.html'">📺 Canais</button>
     </div>
   </div>
@@ -74,7 +73,15 @@
 
 <div class="container">
   <div class="section-title">Filmes na nuvem — assista aqui mesmo</div>
-  <div class="section-sub">Toque na capa para assistir (clássicos, 100% legal). Para filmes novos, use <b>🔎 Onde assistir</b> no topo.</div>
+  <div class="section-sub">Toque na capa para assistir. 100% legal e gratuito (domínio público).</div>
+
+  <div class="section-title">Filmes novos — plataformas oficiais grátis (com anúncios)</div>
+  <div class="section-sub">Abrir o app/site oficial da plataforma. Sempre legal, sempre gratuito:</div>
+  <div class="chips">
+    <button class="chip" onclick="window.open('https://pluto.tv/br','_blank')">🫐 Pluto TV</button>
+    <button class="chip" onclick="window.open('https://tubitv.com','_blank')">🎬 Tubi</button>
+    <button class="chip" onclick="window.open('https://www.youtube.com/movies','_blank')">▶️ YouTube Filmes</button>
+  </div>
   <div class="chips" id="chips">
     <button class="chip active" data-q="collection:(feature_films)">🎬 Clássicos</button>
     <button class="chip" data-q="collection:(film_noir)">🕵️ Film Noir</button>

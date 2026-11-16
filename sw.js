@@ -1,14 +1,9 @@
-var CACHE_NAME = 'newflix-v15';
+var CACHE_NAME = 'newflix-v16';
 var ARQUIVOS = [
   './',
   './index.html',
   './admin.html',
   './filmes.html',
-  './onde-assistir.html',
-  './onde-assistir.css',
-  './onde-assistir.js',
-  './config.js',
-  './icons/icon.svg',
   './manifest.webmanifest',
   './crypto.js',
   './oficiais.js',
