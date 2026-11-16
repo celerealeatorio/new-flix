@@ -150,7 +150,7 @@
 
   <div class="panel">
     <h2>2. Criar / atualizar usuário</h2>
-    <div class="desc">Escolha os canais do catálogo que este usuário poderá ver e por quanto tempo.</div>
+    <div class="desc">Defina login, chave e tempo de acesso. A escolha dos canais fica na seção 5, no fim da página.</div>
     <div class="row-3">
       <div>
         <label for="usuario">Usuário (login)</label>
@@ -181,19 +181,6 @@
       </label>
     </div>
 
-    <div class="btn-row" style="margin-top:16px">
-      <span class="count">Canais selecionados: <b id="selCount">0</b></span>
-      <button class="btn" id="btnSelTodos">Selecionar todos (filtrados)</button>
-      <button class="btn" id="btnSelNenhum">Limpar seleção</button>
-    </div>
-    <label style="margin-top:12px">Canais do catálogo — marque os que este usuário poderá ver:</label>
-    <input type="text" id="pickBusca" placeholder="🔍 Filtrar...">
-    <div class="pick-list" id="pickList" style="margin-top:8px"></div>
-
-    <div class="btn-row">
-      <button class="btn primary" id="btnGerar">🔐 Gerar / atualizar usuário</button>
-    </div>
-    <div class="status" id="gerStatus"></div>
   </div>
 
   <div class="panel">
@@ -231,6 +218,24 @@
       <b>Tempo de acesso:</b> começa a contar no momento da geração; ao expirar, o app bloqueia
       automaticamente (mesmo assistindo). Para renovar, gere o usuário novamente com a mesma chave.
     </div>
+  </div>
+
+  <div class="panel">
+    <h2>5. Escolha dos canais e gerar usuário</h2>
+    <div class="desc">Marque os canais do catálogo (incluindo os ⭐ Oficiais do app) que este usuário poderá ver e clique em Gerar.</div>
+    <div class="btn-row" style="margin-top:0">
+      <span class="count">Canais selecionados: <b id="selCount">0</b></span>
+      <button class="btn" id="btnSelTodos">Selecionar todos (filtrados)</button>
+      <button class="btn" id="btnSelNenhum">Limpar seleção</button>
+    </div>
+    <label style="margin-top:12px">Canais do catálogo — marque os que este usuário poderá ver:</label>
+    <input type="text" id="pickBusca" placeholder="🔍 Filtrar...">
+    <div class="pick-list" id="pickList" style="margin-top:8px"></div>
+
+    <div class="btn-row">
+      <button class="btn primary" id="btnGerar">🔐 Gerar / atualizar usuário</button>
+    </div>
+    <div class="status" id="gerStatus"></div>
   </div>
 </div>
 
