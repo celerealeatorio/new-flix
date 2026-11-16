@@ -1,5 +1,11 @@
 window.USUARIOS = [
   {
+    "usuario": "admin",
+    "salt": "GSJ8/9LahWZLPsIwCh68pQ==",
+    "iv": "hAeGrZ1Hy1weAjlV",
+    "dados": "Hr+R+CB5+LfCMvA/1sj+jX+NygVg1D50u9EDXWQA9xsFFc7IXTflRR0nFbOaJPboZgkXZTwFIqKwdG/ELKljFIrYPrDJyIhXbZFMZ00+EoH2ffTCc5v8NX+zdUZtjeo2oPbZBXLaCDvtIZ411E90I7d2KJGU6YacDahbStSjmN22wfCipBXwmSrLokx6LIqurgfHRcuWZS6ohgFbC5/nym5Wslnyw9tbZrNP2+muB5OjJWPAVNEBEU9cm4siCnau/bgNi2+P7lnp7HM/6ZuUiAyapddSkVz9xc2DMLPiS7tkJlWAuBsuiIXor2gBHqnjrEMqZhNm85UgICrmOYwniG0TgcWRsaj0LGOoYttzExXvt3imujKc0Qc621DzlRo4OQocm6EfZ4K3byhx60cwGQTTvMIx8+icPr7V+NPIbMK5nkKePak2qsh+9lG56iFtafjaAwWDx6NApVHMuhGCLd62mboDBv0bU9PPFXvPJibKV23+FbL9QrbhiHgRtikn9z9XaDDe3V1vGQ6TkJYMbSNSyqIm7rxxcxvnRrGdFSctUCgEDMSgsmr+Fi0XwZKU8LJvhOGWDAHc7ed09Pz1NibiPkFL2PVSJVzCT5PPnTEvIaMPaCkyXSCW16daSorIXWYMTrQ0ZXgUyGAFcXIO1IKszow/ycbPCvGsBHoHlLRHWobhv9QHHeSjNZNDwhzG0IAsr5a2LqypNwARIhV1C+2tfFoHOJ2ZupoNHfmLrvOXCDnp+1UcsvsayT2X7PDbZnE="
+  },
+  {
     "usuario": "Ricardo",
     "salt": "EKYfe/a9u6mC955OyLCEFQ==",
     "iv": "VlwFj/7WjAkZW3nh",
