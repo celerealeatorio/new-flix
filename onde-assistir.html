@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="#090d18">
+  <meta name="description" content="NEWFLIX — descubra onde assistir a filmes e séries em fontes autorizadas.">
+  <link rel="manifest" href="./manifest.webmanifest">
+  <link rel="icon" href="./icons/icon-192.png">
+  <link rel="stylesheet" href="./onde-assistir.css">
+  <title>NEWFLIX — Onde Assistir</title>
+</head>
+<body>
+<header class="top">
+  <a class="brand" href="./index.html">NEW<span>FLIX</span></a>
+  <span class="tag">ONDE ASSISTIR</span>
+  <button class="btn-voltar" onclick="window.location.href='filmes.html'">🎬 Filmes</button>
+</header>
+<main>
+  <section class="hero">
+    <p class="eyebrow">DESCUBRA ONDE ASSISTIR</p>
+    <h1>Filmes e séries<br><em>atualizados.</em></h1>
+    <p class="sub">Pesquise um título e veja onde assistir de graça ou por assinatura — sempre em fontes oficiais.</p>
+    <form id="searchForm" class="search">
+      <input id="query" type="search" placeholder="Buscar título, filme ou série..." minlength="2" autocomplete="off" required>
+      <button type="submit">Buscar</button>
+    </form>
+    <p id="status" class="status" aria-live="polite"></p>
+  </section>
+  <section id="resultsSection" class="section hidden">
+    <div class="sectionHead"><h2>Resultados</h2><span id="count"></span></div>
+    <div id="results" class="grid"></div>
+  </section>
+  <section id="detailSection" class="detail hidden">
+    <button id="back" class="back">← Voltar aos resultados</button>
+    <div id="detailContent"></div>
+  </section>
+</main>
+<footer>NEWFLIX · Disponibilidade pode variar por país e plano. O NEWFLIX não hospeda vídeos.</footer>
+<script src="./config.js"></script>
+<script src="./onde-assistir.js"></script>
+</body>
+</html>
