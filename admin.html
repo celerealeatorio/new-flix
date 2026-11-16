@@ -84,12 +84,27 @@
   .cat-item .edit:hover { color: var(--red); }
   .edit-form { display: flex; gap: 6px; width: 100%; flex-wrap: wrap; }
   .edit-form input { flex: 1; min-width: 120px; padding: 7px 9px; font-size: 0.8rem; }
+  #bannerToken {
+    display: none; background: rgba(229,9,20,.12); border: 1px solid var(--red);
+    border-radius: 8px; padding: 14px 16px; margin-bottom: 14px; font-size: 0.88rem; line-height: 1.6;
+  }
+  #bannerToken.show { display: block; }
+  #bannerToken b { color: var(--red); }
 </style>
 </head>
 <body>
 <div class="topbar"><div class="topbar-inner"><div class="logo">Newflix Admin</div><span class="count" id="resumo"></span></div></div>
 <div class="container">
   <div class="sub">Monte o catálogo, crie usuários com canais e tempo de acesso, e publique o arquivo usuarios.js. Os links <b style="color:var(--red)">nunca</b> ficam legíveis no repositório.</div>
+
+  <div id="bannerToken">
+    ⚠️ <b>Falta 1 passo para a publicação automática:</b> crie um token do GitHub e cole na seção 4.
+    Sem ele, os usuários ficam só neste navegador e <b>não conseguem entrar</b> em outros aparelhos.
+    <div class="btn-row" style="margin-top:10px">
+      <button class="btn primary" id="btnCriarToken">🔑 Criar token no GitHub</button>
+      <span style="color:var(--muted);font-size:0.8rem">Depois cole na seção 4 → Salvar token</span>
+    </div>
+  </div>
 
   <div class="panel">
     <h2>1. Catálogo de canais</h2>
@@ -592,7 +607,7 @@
       if (ghToken()) {
         publicar('Usuário ' + usuario + ' (painel admin)').catch(function () {});
       } else {
-        pubStatus('⚠️ Usuário criado localmente. Salve o token para publicar automaticamente, ou use 🐙 + colar.', 'err');
+        pubStatus('❌ Usuário criado só neste navegador — ele NÃO vai funcionar em outros aparelhos. Configure o token (banner vermelho no topo ou seção 4).', 'err');
       }
     }).catch(function (e) {
       st.textContent = '❌ Erro: ' + e.message;
@@ -674,9 +689,12 @@
       localStorage.setItem(GH.tokenKey, v);
       document.getElementById('ghToken').value = '';
     }
-    pubStatus(ghToken()
-      ? '✅ Token salvo neste navegador. Ao gerar um usuário, a publicação no GitHub é automática.'
-      : '⚠️ Nenhum token informado — veja as instruções acima.', ghToken() ? 'ok' : 'err');
+    if (ghToken()) {
+      document.getElementById('bannerToken').className = '';
+      pubStatus('✅ Token salvo neste navegador. Ao gerar um usuário, a publicação no GitHub é automática.', 'ok');
+    } else {
+      pubStatus('⚠️ Nenhum token informado — veja as instruções acima.', 'err');
+    }
   });
 
   document.getElementById('btnPublicarAgora').addEventListener('click', function () {
@@ -687,7 +705,15 @@
     window.open('https://github.com/' + GH.repo + '/edit/main/' + GH.path, '_blank');
   });
 
-  if (ghToken()) pubStatus('✅ Token salvo neste navegador — publicação automática ativa.', 'ok');
+  if (ghToken()) {
+    pubStatus('✅ Token salvo neste navegador — publicação automática ativa.', 'ok');
+  } else {
+    document.getElementById('bannerToken').className = 'show';
+  }
+
+  document.getElementById('btnCriarToken').addEventListener('click', function () {
+    window.open('https://github.com/settings/personal-access-tokens/new', '_blank');
+  });
 
   fetch('usuarios.js').then(function (r) { return r.text(); }).then(function (txt) {
     var m = txt.match(/window\.USUARIOS\s*=\s*(\[[\s\S]*?\]);?\s*$/);
