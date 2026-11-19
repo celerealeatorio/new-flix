@@ -68,7 +68,6 @@
 
 
   function isYouTube(url) { return /^yt:/i.test(url); }
-  function isPluto(url) { return /^pl:/i.test(url); }
   function ytEmbed(url) {
     var ch = url.replace(/^yt:/i, '');
     return 'https://www.youtube.com/embed/live_stream?channel=' + encodeURIComponent(ch) + '&autoplay=1';
@@ -77,5 +76,5 @@
 
 window.NewflixSessao = sessaoDB;
 window.NewflixRender = renderGrid;
-window.NewflixHelpers = { esc: esc, fmtTempo: fmtTempo, isYouTube: isYouTube, isPluto: isPluto, ytEmbed: ytEmbed };
+window.NewflixHelpers = { esc: esc, fmtTempo: fmtTempo, isYouTube: isYouTube, ytEmbed: ytEmbed };
 })();
