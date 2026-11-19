@@ -2,6 +2,8 @@ var CACHE_NAME = 'newflix-v22-teste';
 var ARQUIVOS = [
   './',
   './index.html',
+  './newflix.css',
+  './newflix-app.js',
   './admin.html',
   './filmes.html',
   './manifest.webmanifest',
