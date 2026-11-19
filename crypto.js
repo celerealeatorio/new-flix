@@ -16,7 +16,7 @@
     return btoa(bin);
   }
 
-  function derivarChave(senha, saltBytes) {
+  function derivarChave(senha, saltBytes, usos) {
     var enc = new TextEncoder();
     return crypto.subtle.importKey('raw', enc.encode(senha), 'PBKDF2', false, ['deriveKey'])
       .then(function (base) {
@@ -25,12 +25,19 @@
           base,
           { name: 'AES-GCM', length: 256 },
           false,
-          ['encrypt', 'decrypt']
+          usos || ['encrypt', 'decrypt']
         );
       });
   }
 
   window.IptvCrypto = {
+    derivarParaSessao: function (entrada, senha) {
+      return derivarChave(senha, b64ParaBytes(entrada.salt), ['decrypt']);
+    },
+    descriptografarComChave: function (entrada, chave) {
+      return crypto.subtle.decrypt({ name: 'AES-GCM', iv: b64ParaBytes(entrada.iv) }, chave, b64ParaBytes(entrada.dados))
+        .then(function (plain) { return new TextDecoder().decode(plain); });
+    },
     criptografar: function (texto, senha) {
       var salt = crypto.getRandomValues(new Uint8Array(16));
       var iv = crypto.getRandomValues(new Uint8Array(12));
