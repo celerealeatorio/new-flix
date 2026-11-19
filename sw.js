@@ -1,7 +1,11 @@
-var CACHE_NAME = 'newflix-v21';
+var CACHE_NAME = 'newflix-v26-plex-teste';
 var ARQUIVOS = [
   './',
   './index.html',
+  './newflix.css',
+  './newflix-app.js',
+  './newflix-catalogo.js',
+  './newflix-helper.js',
   './admin.html',
   './filmes.html',
   './manifest.webmanifest',
