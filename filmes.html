@@ -76,9 +76,9 @@ async function openPlayer(x){
   const files=Array.isArray(metadata.files)?metadata.files:[];
   const playable=files.filter(f=>{
    const name=String(f.name||'').toLowerCase();
-   return /\\.(mp4|m4v|webm|ogv|ogg)$/i.test(name)&&!/(thumb|sample|preview|_small)/i.test(name)&&f.source!=='metadata';
+   return /\.(mp4|m4v|webm|ogv|ogg)$/i.test(name)&&!/(thumb|sample|preview|_small)/i.test(name)&&f.source!=='metadata';
   });
-  const rank=f=>/\\.(mp4|m4v)$/i.test(f.name)?0:/\\.webm$/i.test(f.name)?1:2;
+  const rank=f=>/\.(mp4|m4v)$/i.test(f.name)?0:/\.webm$/i.test(f.name)?1:2;
   playable.sort((a,b)=>rank(a)-rank(b));
   if(!playable.length)throw new Error('Este título não possui arquivo de vídeo compatível para reprodução direta.');
   const file=playable[0];
