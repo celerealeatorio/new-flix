@@ -24,6 +24,18 @@ h2{font-size:22px;margin:28px 0 8px}.sub{color:var(--muted);margin:0 0 16px;line
 .notice{border-left:3px solid var(--red);padding:12px 15px;background:#171717;color:#ccc;line-height:1.55;margin-top:24px;font-size:14px}
 footer{text-align:center;color:#777;padding:25px;font-size:12px}
 @media(max-width:550px){header{align-items:flex-start}.logo{font-size:21px}.search{flex-direction:column}.search .btn{text-align:center}}
+
+.featured{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(260px,.9fr);gap:22px;align-items:center;background:#171717;border:1px solid #333;border-radius:12px;padding:18px;margin:18px 0 28px}
+.featured-poster{position:relative;display:block;padding:0;border:0;background:#111;border-radius:9px;overflow:hidden;color:white;width:100%;text-align:left}
+.featured-poster img{display:block;width:100%;aspect-ratio:16/9;object-fit:cover}
+.featured-poster span{position:absolute;inset:auto 0 0;padding:34px 14px 14px;background:linear-gradient(transparent,#000d);font-weight:800;font-size:18px}
+.featured-copy h3{font-size:25px;margin:10px 0}.featured-copy p{color:#bbb;line-height:1.55}
+.player-wrap{display:none;margin:18px 0 28px;background:#111;border:1px solid #333;border-radius:12px;padding:12px}
+.player-wrap.open{display:block}.player-frame{position:relative;width:100%;aspect-ratio:16/9;background:#000;border-radius:8px;overflow:hidden}
+.player-frame iframe{position:absolute;inset:0;width:100%;height:100%;border:0}
+.player-actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:12px}
+@media(max-width:700px){.featured{grid-template-columns:1fr;padding:12px}.featured-copy h3{font-size:21px}}
+
 </style>
 </head>
 <body>
@@ -34,6 +46,26 @@ footer{text-align:center;color:#777;padding:25px;font-size:12px}
 <p>Encontre filmes e produções disponíveis gratuitamente em plataformas oficiais. Escolha um serviço e assista pelo player da própria plataforma — sem mensalidade.</p>
 <div class="search"><input id="filmSearch" type="search" placeholder="Buscar um filme pelo nome..." aria-label="Buscar filme"><button class="btn" id="searchBtn">Buscar onde assistir</button></div>
 </section>
+
+<h2>Em destaque — filme completo</h2>
+<p class="sub">Filme liberado gratuitamente pela própria distribuidora. Toque na capa para abrir o player aqui no NEWFLIX.</p>
+<section class="featured" aria-label="Filme em destaque">
+<button class="featured-poster" id="playLoveKills" type="button" aria-controls="loveKillsPlayer" aria-expanded="false">
+<img src="https://i.ytimg.com/vi/kfrz_DYAMg4/hqdefault.jpg" alt="Capa do filme Love Kills">
+<span>▶ Assistir Love Kills</span>
+</button>
+<div class="featured-copy">
+<span class="tag">GRÁTIS · O2 PLAY TV · 2026</span>
+<h3>Love Kills</h3>
+<p>Longa brasileiro de terror, ação e vampiros, dirigido por Luiza Shelling Tubaldini. Publicado completo e gratuitamente pela distribuidora O2 Play.</p>
+<a class="btn" href="https://www.youtube.com/@O2PlayFilmes" target="_blank" rel="noopener">Ver novos filmes da O2 Play ↗</a>
+</div>
+</section>
+<section class="player-wrap" id="loveKillsPlayer" aria-label="Player Love Kills">
+<div class="player-frame"><iframe id="loveKillsFrame" title="Love Kills — filme completo no player oficial do YouTube" src="about:blank" loading="lazy" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe></div>
+<div class="player-actions"><a class="btn" href="https://www.youtube.com/watch?v=kfrz_DYAMg4" target="_blank" rel="noopener">Abrir no YouTube ↗</a><button class="btn" id="closeLoveKills" type="button">Fechar player</button></div>
+</section>
+
 <h2>Comece por aqui</h2>
 <p class="sub">Serviços gratuitos disponíveis no Brasil. Alguns exibem anúncios; outros podem pedir cadastro gratuito.</p>
 <section class="grid">
@@ -56,6 +88,24 @@ if(!q){input.focus();return;}
 var url='https://www.google.com/search?q='+encodeURIComponent(''+q+' assistir grátis legal Pluto TV Plex Brasil');
 window.open(url,'_blank','noopener');
 }
+
+var playButton=document.getElementById('playLoveKills');
+var playerBox=document.getElementById('loveKillsPlayer');
+var playerFrame=document.getElementById('loveKillsFrame');
+function openLoveKills(){
+playerFrame.src='https://www.youtube-nocookie.com/embed/kfrz_DYAMg4?rel=0';
+playerBox.classList.add('open');
+playButton.setAttribute('aria-expanded','true');
+playerBox.scrollIntoView({behavior:'smooth',block:'start'});
+}
+function closeLoveKills(){
+playerFrame.src='about:blank';
+playerBox.classList.remove('open');
+playButton.setAttribute('aria-expanded','false');
+}
+playButton.addEventListener('click',openLoveKills);
+document.getElementById('closeLoveKills').addEventListener('click',closeLoveKills);
+
 document.getElementById('searchBtn').addEventListener('click',search);
 input.addEventListener('keydown',function(e){if(e.key==='Enter')search();});
 if('serviceWorker' in navigator){navigator.serviceWorker.register('sw.js').catch(function(){});}
