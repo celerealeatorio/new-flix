@@ -2,133 +2,94 @@
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#090909">
 <title>NEWFLIX — Filmes e séries</title>
 <style>
 :root{color-scheme:dark;--bg:#090909;--panel:#171717;--muted:#aaa;--red:#e50914}
 *{box-sizing:border-box}body{margin:0;background:var(--bg);color:#fff;font-family:Arial,system-ui,sans-serif}
-header{position:sticky;top:0;z-index:5;background:#101010ee;border-bottom:2px solid var(--red);padding:14px 4%;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+header{position:sticky;top:0;z-index:5;background:#101010ee;border-bottom:2px solid var(--red);padding:14px 4%;display:flex;align-items:center;justify-content:space-between;gap:12px}
 .logo{font-size:25px;font-weight:900;letter-spacing:3px;color:var(--red)}
-.btn{cursor:pointer;display:inline-block;padding:10px 15px;border:1px solid #444;border-radius:6px;background:#222;color:white;text-decoration:none;font-weight:700}
-.btn:hover,.btn.active{border-color:var(--red);background:#3a1114}
-main{max-width:1300px;margin:auto;padding:24px 18px 60px}
-.hero{padding:30px 25px;border-radius:12px;background:linear-gradient(110deg,#300509,#171717 70%);margin-bottom:24px}
-h1{font-size:clamp(25px,5vw,42px);margin:0 0 10px}.hero p{color:#ddd;max-width:760px;line-height:1.55;margin:0}
-.toolbar{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin:20px 0}
-.search{flex:1;min-width:210px;padding:13px;border-radius:7px;border:1px solid #555;background:#202020;color:white;font-size:16px}
-.status{color:#bbb;font-size:14px;min-height:22px;margin:10px 0}
-.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(155px,1fr));gap:16px}
-.card{background:var(--panel);border:1px solid #303030;border-radius:9px;overflow:hidden;display:flex;flex-direction:column;min-width:0}
-.poster{width:100%;aspect-ratio:2/3;background:linear-gradient(145deg,#451016,#171717);display:grid;place-items:center;color:#777;font-size:42px;overflow:hidden}
-.poster img{width:100%;height:100%;object-fit:cover}
-.card-info{padding:11px;display:flex;flex-direction:column;gap:8px;flex:1}
-.card h3{font-size:14px;line-height:1.35;margin:0;min-height:38px}.meta{font-size:12px;color:#aaa}
-.watch{margin-top:auto;width:100%;text-align:center}
-.player{display:none;position:fixed;inset:0;z-index:1000;background:#000;padding:0;align-items:center;justify-content:center;flex-direction:column;gap:0}
-.player.open{display:flex}.player-head{display:flex;justify-content:space-between;align-items:center;gap:12px;width:100%;height:52px;flex:0 0 52px;padding:8px 14px;background:#080808}
-.player-frame{position:relative;width:100vw;height:calc(100vh - 52px);background:#000;overflow:hidden;border:0;border-radius:0}
-.player-frame video{position:absolute;inset:0;width:100%;height:100%;border:0;border-radius:0;outline:0;background:#000;object-fit:contain}
-
-.notice{border-left:3px solid var(--red);padding:12px 15px;background:#171717;color:#bbb;line-height:1.5;margin-top:28px;font-size:13px}
-footer{text-align:center;color:#777;padding:25px;font-size:12px}
-@media(max-width:550px){header{align-items:flex-start}.logo{font-size:21px}.grid{grid-template-columns:repeat(2,minmax(0,1fr))}.hero{padding:22px 18px}.player-head{height:48px;flex-basis:48px;padding:7px 10px}.player-frame{height:calc(100vh - 48px)}}
+.btn{cursor:pointer;display:inline-block;padding:11px 15px;border:1px solid #444;border-radius:6px;background:#222;color:white;text-decoration:none;font-weight:700}
+.btn.primary{background:var(--red);border-color:var(--red)}
+main{max-width:1100px;margin:auto;padding:22px 16px 50px}
+.hero{padding:24px;border-radius:10px;background:linear-gradient(110deg,#300509,#171717 70%);margin-bottom:20px}
+h1{font-size:clamp(25px,5vw,38px);margin:0 0 8px}.hero p{color:#ddd;line-height:1.5;margin:0}
+.panel{background:var(--panel);padding:16px;border:1px solid #303030;border-radius:9px;margin-bottom:18px}
+.tabs,.fields{display:flex;gap:9px;flex-wrap:wrap;align-items:center}
+.tabs{margin-bottom:14px}.tabs button.active{border-color:var(--red);background:#3a1114}
+input,select{min-width:0;padding:12px;border:1px solid #555;border-radius:6px;background:#202020;color:white;font-size:16px}
+#contentId{flex:1;min-width:220px}.episode{width:100px}
+.help,.status{color:var(--muted);font-size:13px;line-height:1.5;margin-top:10px}
+.player{display:none;position:fixed;inset:0;z-index:1000;background:#000;flex-direction:column}
+.player.open{display:flex}.player-head{height:48px;flex:0 0 48px;display:flex;align-items:center;justify-content:space-between;padding:6px 12px;background:#080808}
+.frame{position:relative;flex:1;width:100%;background:#000;overflow:hidden}
+.frame iframe{position:absolute;inset:0;width:100%;height:100%;border:0;outline:0;background:#000}
+.notice{border-left:3px solid var(--red);padding:12px 14px;background:#171717;color:#bbb;line-height:1.5;margin-top:22px;font-size:13px}
+@media(max-width:550px){.logo{font-size:21px}.hero{padding:20px}.fields .btn{width:100%}}
 </style>
 </head>
 <body>
 <header><div class="logo">NEWFLIX</div><a class="btn" href="index.html">📺 Canais IPTV</a></header>
 <main>
-<section class="hero"><h1>Filmes e séries</h1><p>Catálogo de obras disponibilizadas no Internet Archive, com reprodução incorporada quando o item permite.</p></section>
-<div class="toolbar">
-<button class="btn active" id="moviesTab" type="button">Filmes</button>
-<input class="search" id="search" type="search" placeholder="Buscar no catálogo..." aria-label="Buscar título">
-<button class="btn" id="reload" type="button">Atualizar</button>
+<section class="hero"><h1>Filmes e séries</h1><p>Player EmbedMovies integrado ao NEWFLIX. Informe o ID do título para abrir a reprodução aqui mesmo, sem sair do aplicativo.</p></section>
+<section class="panel">
+<div class="tabs" role="group" aria-label="Tipo de conteúdo">
+<button class="btn active" id="movieTab" type="button">Filme</button>
+<button class="btn" id="seriesTab" type="button">Série</button>
 </div>
-<div class="status" id="status" role="status">Carregando catálogo...</div>
-<section class="player" id="player" aria-modal="true" role="dialog">
-<div class="player-head"><strong id="playerTitle">Reproduzindo</strong><button class="btn" id="closePlayer" type="button">Fechar ✕</button></div>
-<div class="player-frame"><video id="movieVideo" controls playsinline autoplay preload="metadata"></video></div>
+<form id="playForm">
+<div class="fields">
+<input id="contentId" autocomplete="off" placeholder="ID IMDb (tt...) ou TMDB (ex.: 969681)" aria-label="ID do filme ou série" required>
+<input class="episode" id="season" type="number" min="1" value="1" aria-label="Temporada" hidden>
+<input class="episode" id="episode" type="number" min="1" value="1" aria-label="Episódio" hidden>
+<button class="btn primary" type="submit">▶ Assistir</button>
+</div>
+</form>
+<div class="help" id="help">Filmes: use o ID numérico do TMDB ou o código IMDb iniciado por “tt”.</div>
+<div class="status" id="status" role="status">A reprodução será aberta no player integrado.</div>
 </section>
-<section class="grid" id="catalog" aria-live="polite"></section>
-<div class="notice"><strong>Sobre o catálogo:</strong> os resultados vêm do Internet Archive. A licença é verificada pelos metadados disponíveis antes de exibir o botão Assistir. O idioma cadastrado no acervo não confirma, por si só, que o áudio seja dublado em português. Cada obra mantém seus próprios termos de uso. A área IPTV não foi alterada.</div>
+<section class="panel">
+<strong>Como encontrar um título</strong>
+<p class="help">Use a busca do catálogo EmbedMovies para localizar o filme ou série e obtenha o ID na página correspondente. Depois, cole o ID acima.</p>
+<p style="margin-top:12px"><a class="btn" href="https://embedmovies.org/filmes" target="_blank" rel="noopener noreferrer">Buscar filmes</a> <a class="btn" href="https://embedmovies.org/series" target="_blank" rel="noopener noreferrer">Buscar séries</a></p>
+</section>
+<div class="notice"><strong>Observação:</strong> o EmbedMovies fornece o player por iframe e utiliza servidores de terceiros. O NEWFLIX não controla a disponibilidade, o idioma do áudio, anúncios ou a legalidade dos vídeos hospedados por terceiros. Use apenas conteúdos cuja reprodução você tenha autorização para acessar.</div>
 </main>
-<footer>NEWFLIX · Catálogo do Internet Archive</footer>
+<section class="player" id="player" role="dialog" aria-modal="true" aria-label="Player de vídeo">
+<div class="player-head"><strong id="playerTitle">NEWFLIX · Reproduzindo</strong><button class="btn" id="closePlayer" type="button">Fechar ✕</button></div>
+<div class="frame"><iframe id="embedFrame" title="Player EmbedMovies" allow="autoplay; encrypted-media; picture-in-picture; fullscreen" allowfullscreen referrerpolicy="strict-origin-when-cross-origin"></iframe></div>
+</section>
 <script>
 (function(){
-const API='https://archive.org/advancedsearch.php';
-const catalog=document.getElementById('catalog'),status=document.getElementById('status'),search=document.getElementById('search');
-const movieVideo=document.getElementById('movieVideo'),player=document.getElementById('player'),playerTitle=document.getElementById('playerTitle');
-let items=[],loading=false;
-function permitted(x){
- const l=String(x.licenseurl||'').toLowerCase();
- return l.includes('creativecommons.org/publicdomain')||l.includes('creativecommons.org/licenses/by/')||l.includes('creativecommons.org/licenses/by-sa/');
+let type='movie';
+const form=document.getElementById('playForm'),idInput=document.getElementById('contentId');
+const season=document.getElementById('season'),episode=document.getElementById('episode');
+const player=document.getElementById('player'),frame=document.getElementById('embedFrame');
+const status=document.getElementById('status'),help=document.getElementById('help');
+function setType(next){
+ type=next;
+ document.getElementById('movieTab').classList.toggle('active',type==='movie');
+ document.getElementById('seriesTab').classList.toggle('active',type==='series');
+ season.hidden=episode.hidden=type!=='series';
+ idInput.placeholder=type==='movie'?'ID IMDb (tt...) ou TMDB (ex.: 969681)':'ID numérico TMDB da série';
+ help.textContent=type==='movie'?'Filmes: use o ID numérico do TMDB ou o código IMDb iniciado por “tt”.':'Séries: use o ID numérico do TMDB. Temporada e episódio são opcionais (padrão: 1).';
 }
-function closePlayer(){movieVideo.pause();movieVideo.removeAttribute('src');movieVideo.load();player.classList.remove('open');document.body.style.overflow='';}
-async function openPlayer(x){
- closePlayer();
- playerTitle.textContent=x.title||'Filme';
- player.classList.add('open');document.body.style.overflow='hidden';
- status.textContent='Preparando reprodução sem player externo...';
- try{
-  const response=await fetch('https://archive.org/metadata/'+encodeURIComponent(x.identifier),{cache:'no-store'});
-  if(!response.ok)throw new Error('Metadados indisponíveis');
-  const metadata=await response.json();
-  const files=Array.isArray(metadata.files)?metadata.files:[];
-  const playable=files.filter(f=>{
-   const name=String(f.name||'').toLowerCase();
-   return /\.(mp4|m4v|webm|ogv|ogg)$/i.test(name)&&!/(thumb|sample|preview|_small)/i.test(name)&&f.source!=='metadata';
-  });
-  const rank=f=>/\.(mp4|m4v)$/i.test(f.name)?0:/\.webm$/i.test(f.name)?1:2;
-  playable.sort((a,b)=>rank(a)-rank(b));
-  if(!playable.length)throw new Error('Este título não possui arquivo de vídeo compatível para reprodução direta.');
-  const file=playable[0];
-  const path=String(file.name).split('/').map(encodeURIComponent).join('/');
-  movieVideo.src='https://archive.org/download/'+encodeURIComponent(x.identifier)+'/'+path;
-  movieVideo.load();
-  const started=movieVideo.play();
-  if(started&&typeof started.catch==='function')started.catch(()=>{});
-  status.textContent='Player próprio NEWFLIX · reprodução direta, sem moldura externa.';
- }catch(err){
-  closePlayer();
-  status.textContent=err.message||'Não foi possível abrir este vídeo diretamente.';
- }
-}
-function render(){
- const q=search.value.trim().toLocaleLowerCase('pt-BR');
- const filtered=items.filter(x=>(x.title||'').toLocaleLowerCase('pt-BR').includes(q));
- catalog.innerHTML='';
- if(!filtered.length){status.textContent=items.length?'Nenhum título corresponde à busca.':'Nenhum item com licença aberta identificável foi encontrado nesta consulta.';return;}
- status.textContent=filtered.length+' título(s) exibido(s) · resultados com licença aberta identificável';
- filtered.forEach(x=>{
-  const card=document.createElement('article');card.className='card';
-  const poster=document.createElement('div');poster.className='poster';poster.textContent='🎬';
-  if(x.identifier){const img=document.createElement('img');img.loading='lazy';img.alt='Capa de '+(x.title||'filme');img.src='https://archive.org/services/img/'+encodeURIComponent(x.identifier);img.onerror=()=>img.remove();poster.textContent='';poster.append(img);}
-  const info=document.createElement('div');info.className='card-info';
-  const h=document.createElement('h3');h.textContent=x.title||'Título sem nome';
-  const meta=document.createElement('div');meta.className='meta';meta.textContent=[x.year,x.language].filter(Boolean).join(' · ')||'Metadados do acervo';
-  const btn=document.createElement('button');btn.className='btn watch';btn.type='button';btn.textContent='▶ Assistir';btn.addEventListener('click',()=>openPlayer(x));
-  info.append(h,meta,btn);card.append(poster,info);catalog.append(card);
- });
-}
-async function load(){
- if(loading)return;loading=true;status.textContent='Buscando obras no Internet Archive...';catalog.innerHTML='';closePlayer();
- try{
-  const params=new URLSearchParams({q:'mediatype:movies AND licenseurl:*', 'fl[]':'identifier,title,year,description,licenseurl,language,publicdate','rows':'500','page':'1','output':'json','sort[]':'publicdate desc'});
-  const response=await fetch(API+'?'+params.toString(),{cache:'no-store',headers:{'Accept':'application/json'}});
-  if(!response.ok)throw new Error('HTTP '+response.status);
-  const data=await response.json();
-  items=(data.response&&Array.isArray(data.response.docs)?data.response.docs:[]).filter(x=>x.identifier&&permitted(x));
-  render();
-  if(!items.length)status.textContent='A busca não retornou itens com licença aberta identificável. Tente Atualizar mais tarde.';
- }catch(e){items=[];status.textContent='Não foi possível consultar o Internet Archive agora. Tente novamente mais tarde.';}
- finally{loading=false;}
-}
-document.getElementById('reload').addEventListener('click',load);
+function closePlayer(){frame.src='about:blank';player.classList.remove('open');document.body.style.overflow='';}
+document.getElementById('movieTab').addEventListener('click',()=>setType('movie'));
+document.getElementById('seriesTab').addEventListener('click',()=>setType('series'));
+form.addEventListener('submit',function(e){
+ e.preventDefault();
+ const id=idInput.value.trim();
+ const valid=type==='movie'?(/^(tt\d+|\d+)$/i.test(id)):/^\d+$/.test(id);
+ if(!valid){status.textContent=type==='movie'?'Informe um ID IMDb iniciado por tt ou um ID numérico TMDB.':'Para séries, informe o ID numérico do TMDB.';return;}
+ let url=type==='movie'?'https://myembed.biz/filme/'+encodeURIComponent(id):'https://myembed.biz/serie/'+encodeURIComponent(id)+'/'+Math.max(1,Number(season.value)||1)+'/'+Math.max(1,Number(episode.value)||1);
+ document.getElementById('playerTitle').textContent='NEWFLIX · '+(type==='movie'?'Filme':'Série');
+ frame.src=url;player.classList.add('open');document.body.style.overflow='hidden';
+ status.textContent='Player EmbedMovies carregado. A reprodução depende do servidor de terceiros.';
+});
 document.getElementById('closePlayer').addEventListener('click',closePlayer);
 document.addEventListener('keydown',e=>{if(e.key==='Escape'&&player.classList.contains('open'))closePlayer();});
-player.addEventListener('click',e=>{if(e.target===player)closePlayer();});
-search.addEventListener('input',render);
-load();
 })();
 </script>
 </body>
