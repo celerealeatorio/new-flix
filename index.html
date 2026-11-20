@@ -467,6 +467,62 @@
     canais = (lista || []).filter(function (c) { return !isPluto(c.url); });
     canais.push({ nome: 'Pluto TV ao vivo', logo: '', grupo: '\u2b50 Oficial \u00b7 Gr\u00e1tis', url: 'pl:br' });
     renderGrid();
+    atualizarFavoritosOficiais();
+  }
+
+  // Atualiza somente favoritos com streams gratuitos publicados por fontes oficiais.
+  function nomeComparavel(nome) {
+    return String(nome || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+      .toLowerCase()
+      .replace(/\\b(oficial|ao vivo|full hd|ultra hd|hd|fhd|sd|720p|1080p|4k)\\b/g, ' ')
+      .replace(/[^a-z0-9]/g, '');
+  }
+
+  var atualizandoFavoritosOficiais = false;
+  function atualizarFavoritosOficiais() {
+    if (atualizandoFavoritosOficiais) return;
+    var alvos = canais.filter(function (c) {
+      return !isPluto(c.url) && favoritos.indexOf(c.url) !== -1;
+    });
+    if (!alvos.length) return;
+    atualizandoFavoritosOficiais = true;
+    var playlist = 'https://cdn.jsdelivr.net/gh/streamline-iptv/iptv-playlists@dist/countries/br.m3u';
+    fetch(playlist, { cache: 'no-store' })
+      .then(function (r) {
+        if (!r.ok) throw new Error('Playlist indisponível');
+        return r.text();
+      })
+      .then(function (texto) {
+        var oficiais = parseM3U(texto);
+        var trocados = 0;
+        alvos.forEach(function (favorito) {
+          var chave = nomeComparavel(favorito.nome);
+          if (!chave) return;
+          var correspondente = oficiais.find(function (c) {
+            return nomeComparavel(c.nome) === chave;
+          });
+          if (!correspondente || !correspondente.url) return;
+          var urlJaUsada = canais.some(function (c) {
+            return c !== favorito && c.url === correspondente.url;
+          });
+          if (urlJaUsada) return;
+          favoritos = favoritos.filter(function (url) { return url !== favorito.url; });
+          favorito.url = correspondente.url;
+          favorito.logo = correspondente.logo || favorito.logo;
+          favorito.grupo = 'Oficial gratuito' + (correspondente.grupo && correspondente.grupo !== 'Sem grupo' ? ' · ' + correspondente.grupo : '');
+          if (favoritos.indexOf(favorito.url) === -1) favoritos.push(favorito.url);
+          trocados++;
+        });
+        if (trocados) {
+          lsSet(LS.favs, favoritos);
+          renderGrid();
+          toast('⭐ ' + trocados + ' favorito(s) atualizado(s) com transmissão oficial gratuita.');
+        }
+      })
+      .catch(function () {
+        // A lista externa pode estar temporariamente indisponível; favoritos originais são preservados.
+      })
+      .then(function () { atualizandoFavoritosOficiais = false; });
   }
 
   function bloquear(msg) {
