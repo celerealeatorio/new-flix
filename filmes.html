@@ -101,7 +101,7 @@ input,select{min-width:0;padding:12px;border:1px solid #555;border-radius:6px;ba
 </section>
 <script>
 (function(){
-let type='movie',feed='now_playing';
+let type='movie',feed='now_playing',selectedMovieTitle='';
 const form=document.getElementById('playForm'),idInput=document.getElementById('contentId');
 const season=document.getElementById('season'),episode=document.getElementById('episode');
 const player=document.getElementById('player'),frame=document.getElementById('embedFrame');
@@ -123,7 +123,7 @@ function closePlayer(){frame.src='about:blank';player.classList.remove('open');d
 function playMovie(movie){
  setType('movie');
  idInput.value=String(movie.id);
- document.getElementById('playerTitle').textContent='NEWFLIX · '+(movie.title||movie.original_title||'Filme');
+ selectedMovieTitle=movie.title||movie.original_title||'Filme';
  form.requestSubmit();
 }
 function posterUrl(path){return path?'https://image.tmdb.org/t/p/w342'+path:'';}
@@ -180,7 +180,7 @@ form.addEventListener('submit',function(e){
  const valid=type==='movie'?(/^(tt\d+|\d+)$/i.test(id)):/^\d+$/.test(id);
  if(!valid){status.textContent=type==='movie'?'Informe um ID IMDb iniciado por tt ou um ID numérico TMDB.':'Para séries, informe o ID numérico do TMDB.';return;}
  let url=type==='movie'?'https://myembed.biz/filme/'+encodeURIComponent(id):'https://myembed.biz/serie/'+encodeURIComponent(id)+'/'+Math.max(1,Number(season.value)||1)+'/'+Math.max(1,Number(episode.value)||1);
- frame.src=url;player.classList.add('open');document.body.style.overflow='hidden';
+ document.getElementById('playerTitle').textContent='NEWFLIX · '+(selectedMovieTitle|| (type==='movie'?'Filme':'Série'));\n selectedMovieTitle='';\n frame.src=url;player.classList.add('open');document.body.style.overflow='hidden';
  status.textContent='Player EmbedMovies carregado. A reprodução depende do servidor de terceiros.';
 });
 document.getElementById('closePlayer').addEventListener('click',closePlayer);
