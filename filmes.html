@@ -2,197 +2,63 @@
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#090909">
 <title>NEWFLIX — Filmes</title>
-<meta name="theme-color" content="#0a0a0a">
-<link rel="icon" href="icons/icon-192.png">
-<meta name="mobile-web-app-capable" content="yes">
 <style>
-  :root {
-    --bg: #0a0a0a; --panel: #141414; --panel-2: #1f1f1f; --border: #2a2a2a;
-    --text: #fff; --muted: #b3b3b3; --red: #e50914; --red-dark: #b20710;
-  }
-  * { margin: 0; padding: 0; box-sizing: border-box; }
-  body { font-family: 'Segoe UI', system-ui, sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
-  .topbar { background: rgba(10,10,10,.95); border-bottom: 2px solid var(--red); position: sticky; top: 0; z-index: 40; }
-  .topbar-inner { max-width: 1400px; margin: 0 auto; padding: 12px 16px; display: flex; justify-content: space-between; align-items: center; gap: 10px; flex-wrap: wrap; }
-  .logo { font-size: 1.25rem; font-weight: 900; letter-spacing: 4px; color: var(--red); text-transform: uppercase; }
-  .header-right { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
-  .btn {
-    padding: 10px 16px; border-radius: 6px; border: 1px solid var(--border);
-    background: var(--panel-2); color: var(--text); font-size: 0.88rem; font-weight: 600; cursor: pointer;
-  }
-  .btn:hover { border-color: var(--red); color: var(--red); }
-  .btn.primary { background: var(--red); border-color: var(--red); color: #fff; }
-  .btn.primary:hover { background: var(--red-dark); color: #fff; }
-  .container { max-width: 1400px; margin: 0 auto; padding: 18px 16px 60px; }
-  .section-title { font-size: 1.05rem; font-weight: 700; margin: 22px 0 4px; }
-  .section-sub { font-size: 0.8rem; color: var(--muted); margin-bottom: 14px; }
-  .chips { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 16px; }
-  .chip {
-    padding: 9px 16px; border-radius: 20px; border: 1px solid var(--border);
-    background: var(--panel); color: var(--muted); font-size: 0.82rem; cursor: pointer;
-  }
-  .chip.active, .chip:hover { color: #fff; border-color: var(--red); background: rgba(229,9,20,.15); }
-  .movie-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 14px; }
-  .movie {
-    background: var(--panel); border: 1px solid var(--border); border-radius: 8px; overflow: hidden;
-    cursor: pointer; transition: transform .15s, border-color .15s, box-shadow .15s;
-  }
-  .movie:hover { transform: scale(1.04); border-color: var(--red); box-shadow: 0 8px 24px rgba(229,9,20,.25); z-index: 2; }
-  .movie .cover { aspect-ratio: 2 / 3; background: linear-gradient(135deg, #1a1a1a, #101010); display: flex; align-items: center; justify-content: center; }
-  .movie .cover img { width: 100%; height: 100%; object-fit: cover; }
-  .movie .txt { padding: 9px 10px 11px; border-top: 2px solid var(--red); }
-  .movie .txt .name { font-size: 0.8rem; font-weight: 700; line-height: 1.25; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
-  .movie .txt .year { font-size: 0.7rem; color: var(--muted); margin-top: 3px; }
-  .status { text-align: center; color: var(--muted); padding: 40px 10px; font-size: 0.9rem; grid-column: 1 / -1; }
-  .modal {
-    position: fixed; inset: 0; background: rgba(0,0,0,.92); z-index: 80;
-    display: none; align-items: center; justify-content: center; padding: 16px; flex-direction: column; gap: 12px;
-  }
-  .modal.open { display: flex; }
-  .modal iframe { width: 100%; max-width: 960px; aspect-ratio: 16 / 9; border: 0; border-radius: 8px; background: #000; }
-  .modal .m-title { font-weight: 700; font-size: 1rem; }
-  footer { margin-top: 30px; font-size: 0.75rem; color: #555; text-align: center; line-height: 1.7; padding: 0 16px; }
-  @media (max-width: 700px) {
-    .movie-grid { grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)); gap: 10px; }
-    .container { padding: 12px 10px 50px; }
-  }
+:root{color-scheme:dark;--bg:#090909;--panel:#171717;--muted:#aaa;--red:#e50914}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:#fff;font-family:Arial,system-ui,sans-serif}
+header{position:sticky;top:0;z-index:5;background:#101010ee;border-bottom:2px solid var(--red);padding:14px 4%;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.logo{font-size:25px;font-weight:900;letter-spacing:3px;color:var(--red)}
+nav{display:flex;gap:9px;flex-wrap:wrap}a,button{cursor:pointer} .btn{display:inline-block;padding:10px 15px;border:1px solid #444;border-radius:6px;background:#222;color:white;text-decoration:none;font-weight:700}.btn:hover{border-color:var(--red);background:#333}
+main{max-width:1250px;margin:auto;padding:24px 18px 60px}
+.hero{padding:30px 25px;border-radius:12px;background:linear-gradient(110deg,#300509,#171717 70%);margin-bottom:28px}
+h1{font-size:clamp(25px,5vw,42px);margin:0 0 10px}.hero p{color:#ddd;max-width:700px;line-height:1.55;margin:0 0 18px}
+h2{font-size:22px;margin:28px 0 8px}.sub{color:var(--muted);margin:0 0 16px;line-height:1.5}
+.search{display:flex;gap:8px;max-width:700px}.search input{flex:1;min-width:0;padding:13px;border-radius:7px;border:1px solid #555;background:#202020;color:white;font-size:16px}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:15px}
+.card{background:var(--panel);border:1px solid #303030;border-radius:10px;overflow:hidden;display:flex;flex-direction:column;min-height:225px}
+.art{height:105px;display:grid;place-items:center;font-size:45px;background:linear-gradient(135deg,#3b080d,#181818)}
+.info{padding:15px;display:flex;flex-direction:column;align-items:flex-start;gap:9px;flex:1}.info h3{margin:0;font-size:19px}.info p{margin:0;color:#bbb;font-size:14px;line-height:1.45;flex:1}
+.tag{font-size:11px;color:#ddd;border:1px solid #555;border-radius:20px;padding:4px 8px}
+.notice{border-left:3px solid var(--red);padding:12px 15px;background:#171717;color:#ccc;line-height:1.55;margin-top:24px;font-size:14px}
+footer{text-align:center;color:#777;padding:25px;font-size:12px}
+@media(max-width:550px){header{align-items:flex-start}.logo{font-size:21px}.search{flex-direction:column}.search .btn{text-align:center}}
 </style>
 </head>
 <body>
-<div class="topbar">
-  <div class="topbar-inner">
-    <div class="logo">Newflix Filmes</div>
-    <div class="header-right">
-      <input type="text" id="busca" placeholder="🔍 Buscar filme..." style="padding:10px 12px;background:var(--panel-2);border:1px solid var(--border);border-radius:6px;color:var(--text);font-size:14px;outline:none;flex:1;min-width:150px">
-      <button class="btn" onclick="window.location.href='index.html'">📺 Canais</button>
-    </div>
-  </div>
-</div>
-
-<div class="container">
-  <div class="section-title">Filmes na nuvem — assista aqui mesmo</div>
-  <div class="section-sub">Toque na capa para assistir. 100% legal e gratuito (domínio público).</div>
-
-  <div class="section-title">Filmes novos — plataformas oficiais grátis (com anúncios)</div>
-  <div class="section-sub">Abrir o app/site oficial da plataforma. Sempre legal, sempre gratuito:</div>
-  <div class="chips">
-    <button class="chip" onclick="window.open('https://pluto.tv/br','_blank')">🫐 Pluto TV</button>
-    <button class="chip" onclick="window.open('https://tubitv.com','_blank')">🎬 Tubi</button>
-    <button class="chip" onclick="window.open('https://www.youtube.com/movies','_blank')">▶️ YouTube Filmes</button>
-  </div>
-  <div class="chips" id="chips">
-    <button class="chip active" data-q="collection:(feature_films)">🎬 Clássicos</button>
-    <button class="chip" data-q="collection:(film_noir)">🕵️ Film Noir</button>
-    <button class="chip" data-q="collection:(scifi_horrOR)">👽 Ficção & Terror</button>
-    <button class="chip" data-q="collection:(comedy_films)">😂 Comédia</button>
-    <button class="chip" data-q="collection:(westerns)">🤠 Faroeste</button>
-    <button class="chip" data-q="collection:(animationandcartoons)">🐭 Desenhos</button>
-  </div>
-  <div class="movie-grid" id="movieGrid">
-    <div class="status">⏳ Carregando filmes...</div>
-  </div>
-</div>
-
-<div class="modal" id="modal">
-  <iframe id="playerFrame" allow="autoplay; fullscreen" allowfullscreen></iframe>
-  <div class="m-title" id="mTitle"></div>
-  <button class="btn" id="btnFechar">✕ Fechar</button>
-</div>
-
-<footer>
-  Filmes em domínio público podem ser distribuídos livremente. Não hospedamos nem indexamos conteúdo pirata.
-</footer>
-
+<header><div class="logo">NEWFLIX</div><nav><a class="btn" href="index.html">📺 Canais IPTV</a></nav></header>
+<main>
+<section class="hero">
+<h1>Filmes para assistir grátis</h1>
+<p>Encontre filmes e produções disponíveis gratuitamente em plataformas oficiais. Escolha um serviço e assista pelo player da própria plataforma — sem mensalidade.</p>
+<div class="search"><input id="filmSearch" type="search" placeholder="Buscar um filme pelo nome..." aria-label="Buscar filme"><button class="btn" id="searchBtn">Buscar onde assistir</button></div>
+</section>
+<h2>Comece por aqui</h2>
+<p class="sub">Serviços gratuitos disponíveis no Brasil. Alguns exibem anúncios; outros podem pedir cadastro gratuito.</p>
+<section class="grid">
+<article class="card"><div class="art">🍿</div><div class="info"><span class="tag">GRÁTIS · SEM CONTA OBRIGATÓRIA</span><h3>Pluto TV</h3><p>Filmes sob demanda e canais ao vivo gratuitos, com anúncios.</p><a class="btn" href="https://pluto.tv/br" target="_blank" rel="noopener">Abrir Pluto TV ↗</a></div></article>
+<article class="card"><div class="art">🎞️</div><div class="info"><span class="tag">GRÁTIS · CONTA NÃO NECESSÁRIA</span><h3>Plex</h3><p>Catálogo gratuito de filmes e séries com anúncios. A disponibilidade varia.</p><a class="btn" href="https://watch.plex.tv" target="_blank" rel="noopener">Abrir Plex ↗</a></div></article>
+<article class="card"><div class="art">🎥</div><div class="info"><span class="tag">GRÁTIS · PRODUÇÕES INDEPENDENTES</span><h3>Libreflix</h3><p>Produções independentes e obras de livre exibição.</p><a class="btn" href="https://libreflix.org" target="_blank" rel="noopener">Abrir Libreflix ↗</a></div></article>
+<article class="card"><div class="art">▶️</div><div class="info"><span class="tag">GRÁTIS · SEM LOGIN PARA VÍDEOS PÚBLICOS</span><h3>YouTube — canais oficiais</h3><p>Filmes publicados legalmente por produtoras e distribuidoras oficiais.</p><a class="btn" href="https://www.youtube.com/results?search_query=filme+completo+canal+oficial" target="_blank" rel="noopener">Ver filmes oficiais ↗</a></div></article>
+<article class="card"><div class="art">🇧🇷</div><div class="info"><span class="tag">GRÁTIS · CONTA GOV.BR</span><h3>Tela Brasil</h3><p>Plataforma pública com obras audiovisuais brasileiras. Exige conta gratuita.</p><a class="btn" href="https://telabrasil.com.br" target="_blank" rel="noopener">Abrir Tela Brasil ↗</a></div></article>
+<article class="card"><div class="art">🎬</div><div class="info"><span class="tag">GRÁTIS · CINEMA BRASILEIRO</span><h3>Spcine Play</h3><p>Filmes brasileiros e conteúdos culturais; cadastro gratuito pode ser solicitado.</p><a class="btn" href="https://www.spcineplay.com.br" target="_blank" rel="noopener">Abrir Spcine Play ↗</a></div></article>
+</section>
+<div class="notice"><strong>Sobre filmes recém-lançados:</strong> lançamentos de cinema e títulos de serviços pagos normalmente não ficam disponíveis gratuitamente sem autorização. Esta página não oferece cópias não autorizadas. A busca abre resultados nos serviços oficiais; o catálogo e a disponibilidade mudam conforme cada plataforma.</div>
+</main>
+<footer>NEWFLIX Filmes · Links para plataformas oficiais. IPTV e demais áreas do aplicativo não foram alterados.</footer>
 <script>
-(function () {
-  'use strict';
-
-  if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('sw.js').catch(function () {});
-  }
-
-  var colecaoAtual = 'collection:(feature_films)';
-  var buscaAtual = '';
-  var pagina = 1;
-
-  function esc(s) {
-    return String(s).replace(/[&<>"']/g, function (c) {
-      return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
-    });
-  }
-
-  function carregar() {
-    var grid = document.getElementById('movieGrid');
-    grid.innerHTML = '<div class="status">⏳ Carregando filmes...</div>';
-    var q = colecaoAtual + ' AND mediatype:(movies)';
-    if (buscaAtual) q += ' AND title:(' + buscaAtual.replace(/[":()]/g, ' ') + ')';
-    var url = 'https://archive.org/advancedsearch.php?q=' + encodeURIComponent(q) +
-      '&fl%5B%5D=identifier&fl%5B%5D=title&fl%5B%5D=year&rows=48&page=' + pagina +
-      '&sort%5B%5D=downloads+desc&output=json';
-
-    fetch(url).then(function (r) { return r.json(); }).then(function (data) {
-      var docs = (data.response && data.response.docs) || [];
-      if (!docs.length) {
-        grid.innerHTML = '<div class="status">Nenhum filme encontrado.</div>';
-        return;
-      }
-      grid.innerHTML = docs.map(function (d) {
-        return '<div class="movie" data-id="' + esc(d.identifier) + '" data-title="' + esc(d.title || 'Filme') + '">' +
-          '<div class="cover"><img src="https://archive.org/services/img/' + esc(d.identifier) + '" alt="" loading="lazy"></div>' +
-          '<div class="txt"><div class="name">' + esc(d.title || 'Filme') + '</div>' +
-          '<div class="year">' + esc(d.year || '') + '</div></div></div>';
-      }).join('');
-    }).catch(function () {
-      grid.innerHTML = '<div class="status">❌ Falha ao carregar. Verifique sua conexão.</div>';
-    });
-  }
-
-  document.getElementById('chips').addEventListener('click', function (e) {
-    var chip = e.target.closest('.chip');
-    if (!chip) return;
-    Array.prototype.forEach.call(document.querySelectorAll('.chip'), function (c) { c.className = 'chip'; });
-    chip.className = 'chip active';
-    colecaoAtual = chip.getAttribute('data-q');
-    pagina = 1;
-    carregar();
-  });
-
-  var buscaTimer = null;
-  document.getElementById('busca').addEventListener('input', function () {
-    clearTimeout(buscaTimer);
-    var v = this.value.trim();
-    buscaTimer = setTimeout(function () {
-      buscaAtual = v;
-      pagina = 1;
-      carregar();
-    }, 500);
-  });
-
-  document.getElementById('movieGrid').addEventListener('click', function (e) {
-    var card = e.target.closest('.movie');
-    if (!card) return;
-    var id = card.getAttribute('data-id');
-    document.getElementById('playerFrame').src = 'https://archive.org/embed/' + id;
-    document.getElementById('mTitle').textContent = card.getAttribute('data-title');
-    document.getElementById('modal').className = 'modal open';
-  });
-
-  document.getElementById('btnFechar').addEventListener('click', function () {
-    document.getElementById('modal').className = 'modal';
-    document.getElementById('playerFrame').src = '';
-  });
-  document.getElementById('modal').addEventListener('click', function (e) {
-    if (e.target === this) {
-      this.className = 'modal';
-      document.getElementById('playerFrame').src = '';
-    }
-  });
-
-
-  carregar();
+(function(){
+var input=document.getElementById('filmSearch');
+function search(){
+var q=input.value.trim();
+if(!q){input.focus();return;}
+var url='https://www.google.com/search?q='+encodeURIComponent(''+q+' assistir grátis legal Pluto TV Plex Brasil');
+window.open(url,'_blank','noopener');
+}
+document.getElementById('searchBtn').addEventListener('click',search);
+input.addEventListener('keydown',function(e){if(e.key==='Enter')search();});
+if('serviceWorker' in navigator){navigator.serviceWorker.register('sw.js').catch(function(){});}
 })();
 </script>
-</body>
-</html>
+</body></html>
