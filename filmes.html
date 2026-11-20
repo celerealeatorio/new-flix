@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#090909">
-<title>NEWFLIX — Filmes e séries</title>
+<title>NEWFLIX — Filmes</title>
 <style>
 :root{color-scheme:dark;--bg:#090909;--panel:#171717;--muted:#aaa;--red:#e50914}
 *{box-sizing:border-box}body{margin:0;background:var(--bg);color:#fff;font-family:Arial,system-ui,sans-serif}
@@ -16,176 +16,136 @@ main{max-width:1100px;margin:auto;padding:22px 16px 50px}
 .hero{padding:24px;border-radius:10px;background:linear-gradient(110deg,#300509,#171717 70%);margin-bottom:20px}
 h1{font-size:clamp(25px,5vw,38px);margin:0 0 8px}.hero p{color:#ddd;line-height:1.5;margin:0}
 .panel{background:var(--panel);padding:16px;border:1px solid #303030;border-radius:9px;margin-bottom:18px}
-.tabs,.fields{display:flex;gap:9px;flex-wrap:wrap;align-items:center}
-.tabs{margin-bottom:14px}.tabs button.active{border-color:var(--red);background:#3a1114}
-input,select{min-width:0;padding:12px;border:1px solid #555;border-radius:6px;background:#202020;color:white;font-size:16px}
-#contentId{flex:1;min-width:220px}.episode{width:100px}
-.help,.status{color:var(--muted);font-size:13px;line-height:1.5;margin-top:10px}
-.player{display:none;position:fixed;inset:0;z-index:1000;background:#000;flex-direction:column}
-.player.open{display:flex}.player-head{height:48px;flex:0 0 48px;display:flex;align-items:center;justify-content:space-between;padding:6px 12px;background:#080808}
-.frame{position:relative;flex:1;width:100%;background:#000;overflow:hidden}
-.frame iframe{position:absolute;inset:0;width:100%;height:100%;border:0;outline:0;background:#000}
-.notice{border-left:3px solid var(--red);padding:12px 14px;background:#171717;color:#bbb;line-height:1.5;margin-top:22px;font-size:13px}
-
 .catalog-head{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:14px}
-.catalog-tabs{display:flex;gap:8px;flex-wrap:wrap}
+.catalog-tabs{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px}
 .catalog-tabs button.active{background:#4a1115;border-color:var(--red)}
+.fields{display:flex;gap:9px;flex-wrap:wrap;align-items:center;margin-bottom:14px}
+input{flex:1;min-width:180px;padding:12px;border:1px solid #555;border-radius:6px;background:#202020;color:white;font-size:16px}
 .movie-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(135px,1fr));gap:14px}
 .movie-card{min-width:0;background:#202020;border:1px solid #333;border-radius:8px;overflow:hidden;cursor:pointer;color:#fff;text-align:left;padding:0}
 .movie-card img{display:block;width:100%;aspect-ratio:2/3;object-fit:cover;background:#292929}
-.movie-card .movie-info{padding:9px}
+.movie-card .movie-info{display:block;padding:9px}
 .movie-card strong{display:block;font-size:14px;line-height:1.3}
 .movie-card small{display:block;color:#aaa;margin-top:5px}
 .movie-card:focus-visible{outline:2px solid var(--red);outline-offset:3px}
 .catalog-status{color:#aaa;font-size:14px;padding:16px 2px}
-.token-row{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
-.token-row input{flex:1;min-width:220px}
-@media(max-width:550px){.movie-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}}
-
-@media(max-width:550px){.logo{font-size:21px}.hero{padding:20px}.fields .btn{width:100%}}
+.player{display:none;position:fixed;inset:0;z-index:1000;background:#000;flex-direction:column}
+.player.open{display:flex}.player-head{height:48px;flex:0 0 48px;display:flex;align-items:center;justify-content:space-between;padding:6px 12px;background:#080808}
+.frame{position:relative;flex:1;width:100%;background:#000;overflow:hidden}
+.frame iframe{position:absolute;inset:0;width:100%;height:100%;border:0;background:#000}
+.notice{border-left:3px solid var(--red);padding:12px 14px;background:#171717;color:#bbb;line-height:1.5;margin-top:22px;font-size:13px}
+@media(max-width:550px){.logo{font-size:21px}.hero{padding:20px}.movie-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}}
 </style>
 </head>
 <body>
 <header><div class="logo">NEWFLIX</div><a class="btn" href="index.html">📺 Canais IPTV</a></header>
 <main>
-<section class="hero"><h1>Filmes e séries</h1><p>Player EmbedMovies integrado ao NEWFLIX. Informe o ID do título para abrir a reprodução aqui mesmo, sem sair do aplicativo.</p></section>
+<section class="hero"><h1>Escolha e assista</h1><p>Toque na capa para abrir o filme diretamente no player. Não precisa de conta, token ou copiar códigos.</p></section>
 <section class="panel">
-<div class="tabs" role="group" aria-label="Tipo de conteúdo">
-<button class="btn active" id="movieTab" type="button">Filme</button>
-<button class="btn" id="seriesTab" type="button">Série</button>
-</div>
-<form id="playForm">
-<div class="fields">
-<input id="contentId" autocomplete="off" placeholder="ID IMDb (tt...) ou TMDB (ex.: 969681)" aria-label="ID do filme ou série" required>
-<input class="episode" id="season" type="number" min="1" value="1" aria-label="Temporada" hidden>
-<input class="episode" id="episode" type="number" min="1" value="1" aria-label="Episódio" hidden>
-<button class="btn primary" type="submit">▶ Assistir</button>
-</div>
-</form>
-<div class="help" id="help">Filmes: use o ID numérico do TMDB ou o código IMDb iniciado por “tt”.</div>
-<div class="status" id="status" role="status">A reprodução será aberta no player integrado.</div>
+ <div class="catalog-head"><strong>Catálogo de filmes</strong><span id="catalogCount" class="catalog-status">Catálogo público</span></div>
+ <div class="catalog-tabs" role="group" aria-label="Categorias">
+  <button class="btn active" type="button" data-feed="popular">Populares</button>
+  <button class="btn" type="button" data-feed="recent">Lançamentos 2026</button>
+ </div>
+ <div class="fields">
+  <input id="movieSearch" type="search" placeholder="Buscar filme pelo nome" aria-label="Buscar filme pelo nome">
+  <button class="btn" id="searchMovies" type="button">Buscar</button>
+ </div>
+ <div class="movie-grid" id="movieGrid" aria-live="polite"></div>
+ <div class="catalog-status" id="catalogStatus">Carregando filmes...</div>
 </section>
-<section class="panel">
-<div class="catalog-head"><strong>Catálogo de filmes</strong><span class="help" id="catalogCount">Atualizado pelo TMDB</span></div>
-<div class="catalog-tabs" role="group" aria-label="Categorias de filmes">
-<button class="btn active" type="button" data-feed="now_playing">Em cartaz</button>
-<button class="btn" type="button" data-feed="popular">Populares</button>
-<button class="btn" type="button" data-feed="trending">Em alta</button>
-</div>
-<div class="fields" style="margin-top:12px">
-<input id="movieSearch" type="search" placeholder="Buscar filme pelo nome" aria-label="Buscar filme pelo nome">
-<button class="btn" id="searchMovies" type="button">Buscar</button>
-</div>
-<div class="movie-grid" id="movieGrid" aria-live="polite"></div>
-<div class="catalog-status" id="catalogStatus">Para carregar as capas, configure sua chave de acesso gratuita do TMDB.</div>
-</section>
-<section class="panel">
-<strong>Conectar catálogo de capas (TMDB)</strong>
-<p class="help">A chave fica salva somente neste aparelho, não será gravada no GitHub. Use o API Read Access Token da sua conta TMDB.</p>
-<div class="token-row">
-<input id="tmdbToken" type="password" autocomplete="off" placeholder="Cole aqui o API Read Access Token">
-<button class="btn primary" id="saveToken" type="button">Salvar e carregar</button>
-</div>
-<p class="help">O catálogo mostra pôsteres e informações. A reprodução continua sendo feita pelo EmbedMovies.</p>
-</section>
-<section class="panel">
-<strong>Como encontrar um título</strong>
-<p class="help">Use a busca do catálogo EmbedMovies para localizar o filme ou série e obtenha o ID na página correspondente. Depois, cole o ID acima.</p>
-<p style="margin-top:12px"><a class="btn" href="https://embedmovies.org/filmes" target="_blank" rel="noopener noreferrer">Buscar filmes</a> <a class="btn" href="https://embedmovies.org/series" target="_blank" rel="noopener noreferrer">Buscar séries</a></p>
-</section>
-<div class="notice"><strong>Observação:</strong> o EmbedMovies fornece o player por iframe e utiliza servidores de terceiros. O NEWFLIX não controla a disponibilidade, o idioma do áudio, anúncios ou a legalidade dos vídeos hospedados por terceiros. Use apenas conteúdos cuja reprodução você tenha autorização para acessar.</div>
+<div class="notice"><strong>Importante:</strong> o catálogo fornece títulos, capas e identificadores. A reprodução é aberta em um player de terceiros; a disponibilidade de cada filme depende desse servidor e não pode ser garantida pelo NEWFLIX.</div>
 </main>
 <section class="player" id="player" role="dialog" aria-modal="true" aria-label="Player de vídeo">
-<div class="player-head"><strong id="playerTitle">NEWFLIX · Reproduzindo</strong><button class="btn" id="closePlayer" type="button">Fechar ✕</button></div>
-<div class="frame"><iframe id="embedFrame" title="Player EmbedMovies" allow="autoplay; encrypted-media; picture-in-picture; fullscreen" allowfullscreen referrerpolicy="strict-origin-when-cross-origin"></iframe></div>
+ <div class="player-head"><strong id="playerTitle">NEWFLIX · Filme</strong><button class="btn" id="closePlayer" type="button">Fechar ✕</button></div>
+ <div class="frame"><iframe id="embedFrame" title="Player de filme" allow="autoplay; encrypted-media; picture-in-picture; fullscreen" allowfullscreen referrerpolicy="strict-origin-when-cross-origin"></iframe></div>
 </section>
 <script>
 (function(){
-let type='movie',feed='now_playing',selectedMovieTitle='';
-const form=document.getElementById('playForm'),idInput=document.getElementById('contentId');
-const season=document.getElementById('season'),episode=document.getElementById('episode');
-const player=document.getElementById('player'),frame=document.getElementById('embedFrame');
-const status=document.getElementById('status'),help=document.getElementById('help');
-const grid=document.getElementById('movieGrid'),catalogStatus=document.getElementById('catalogStatus');
-const tokenInput=document.getElementById('tmdbToken');
-const TOKEN_KEY='newflix_tmdb_read_token';
-let token=localStorage.getItem(TOKEN_KEY)||'';
-tokenInput.value=token;
-function setType(next){
- type=next;
- document.getElementById('movieTab').classList.toggle('active',type==='movie');
- document.getElementById('seriesTab').classList.toggle('active',type==='series');
- season.hidden=episode.hidden=type!=='series';
- idInput.placeholder=type==='movie'?'ID IMDb (tt...) ou TMDB (ex.: 969681)':'ID numérico TMDB da série';
- help.textContent=type==='movie'?'Filmes: use o ID numérico do TMDB ou o código IMDb iniciado por “tt”.':'Séries: use o ID numérico do TMDB. Temporada e episódio são opcionais (padrão: 1).';
-}
-function closePlayer(){frame.src='about:blank';player.classList.remove('open');document.body.style.overflow='';}
-function playMovie(movie){
- setType('movie');
- idInput.value=String(movie.id);
- selectedMovieTitle=movie.title||movie.original_title||'Filme';
- form.requestSubmit();
-}
-function posterUrl(path){return path?'https://image.tmdb.org/t/p/w342'+path:'';}
-function renderMovies(items){
- grid.innerHTML='';
- if(!items||!items.length){catalogStatus.textContent='Nenhum filme encontrado.';return;}
- items.forEach(movie=>{
-  const card=document.createElement('button');card.type='button';card.className='movie-card';
-  const img=document.createElement('img');img.loading='lazy';img.alt='Capa de '+(movie.title||'filme');
-  img.src=posterUrl(movie.poster_path);img.onerror=()=>{img.style.visibility='hidden';};
-  const info=document.createElement('span');info.className='movie-info';
-  const title=document.createElement('strong');title.textContent=movie.title||movie.original_title||'Título indisponível';
-  const date=document.createElement('small');date.textContent=movie.release_date?new Date(movie.release_date+'T12:00:00').toLocaleDateString('pt-BR'):'Data não informada';
-  info.append(title,date);card.append(img,info);card.addEventListener('click',()=>playMovie(movie));grid.append(card);
- });
- catalogStatus.textContent=items.length+' filmes carregados. Toque em uma capa para abrir o player.';
- document.getElementById('catalogCount').textContent=items.length+' títulos';
-}
-async function tmdb(path){
- if(!token){catalogStatus.textContent='Configure o API Read Access Token do TMDB para carregar as capas.';return null;}
- const response=await fetch('https://api.themoviedb.org/3/'+path,{headers:{Authorization:'Bearer '+token,Accept:'application/json'}});
- if(!response.ok)throw new Error(response.status===401?'Token inválido. Confira o API Read Access Token.':'Falha ao consultar o catálogo (HTTP '+response.status+').');
- return response.json();
-}
-async function loadFeed(nextFeed){
- feed=nextFeed;
- document.querySelectorAll('[data-feed]').forEach(b=>b.classList.toggle('active',b.dataset.feed===feed));
- catalogStatus.textContent='Carregando filmes...';grid.innerHTML='';
- try{
-  const path=feed==='trending'?'trending/movie/week?language=pt-BR':'movie/'+feed+'?language=pt-BR&page=1';
-  const data=await tmdb(path);if(data)renderMovies(data.results||[]);
- }catch(err){catalogStatus.textContent=err.message;}
-}
-async function searchMovies(){
- const q=document.getElementById('movieSearch').value.trim();
- if(!q){loadFeed(feed);return;}
- catalogStatus.textContent='Buscando filmes...';grid.innerHTML='';
- try{const data=await tmdb('search/movie?language=pt-BR&include_adult=false&query='+encodeURIComponent(q));if(data)renderMovies(data.results||[]);}
- catch(err){catalogStatus.textContent=err.message;}
-}
-document.getElementById('movieTab').addEventListener('click',()=>setType('movie'));
-document.getElementById('seriesTab').addEventListener('click',()=>setType('series'));
-document.querySelectorAll('[data-feed]').forEach(b=>b.addEventListener('click',()=>loadFeed(b.dataset.feed)));
-document.getElementById('searchMovies').addEventListener('click',searchMovies);
-document.getElementById('movieSearch').addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();searchMovies();}});
-document.getElementById('saveToken').addEventListener('click',()=>{
- token=tokenInput.value.trim();
- if(!token){localStorage.removeItem(TOKEN_KEY);catalogStatus.textContent='Cole o API Read Access Token do TMDB.';return;}
- localStorage.setItem(TOKEN_KEY,token);loadFeed(feed);
-});
-form.addEventListener('submit',function(e){
- e.preventDefault();
- const id=idInput.value.trim();
- const valid=type==='movie'?(/^(tt\d+|\d+)$/i.test(id)):/^\d+$/.test(id);
- if(!valid){status.textContent=type==='movie'?'Informe um ID IMDb iniciado por tt ou um ID numérico TMDB.':'Para séries, informe o ID numérico do TMDB.';return;}
- let url=type==='movie'?'https://myembed.biz/filme/'+encodeURIComponent(id):'https://myembed.biz/serie/'+encodeURIComponent(id)+'/'+Math.max(1,Number(season.value)||1)+'/'+Math.max(1,Number(episode.value)||1);
- document.getElementById('playerTitle').textContent='NEWFLIX · '+(selectedMovieTitle|| (type==='movie'?'Filme':'Série'));\n selectedMovieTitle='';\n frame.src=url;player.classList.add('open');document.body.style.overflow='hidden';
- status.textContent='Player EmbedMovies carregado. A reprodução depende do servidor de terceiros.';
-});
-document.getElementById('closePlayer').addEventListener('click',closePlayer);
-document.addEventListener('keydown',e=>{if(e.key==='Escape'&&player.classList.contains('open'))closePlayer();});
-if(token)loadFeed(feed);else catalogStatus.textContent='Cole seu API Read Access Token do TMDB abaixo para carregar capas e filmes recentes.';
+ const BASE='https://v3-cinemeta.strem.io';
+ const grid=document.getElementById('movieGrid');
+ const status=document.getElementById('catalogStatus');
+ const count=document.getElementById('catalogCount');
+ const search=document.getElementById('movieSearch');
+ const player=document.getElementById('player');
+ const frame=document.getElementById('embedFrame');
+ let feed='popular';
+ let requestNumber=0;
+ const CACHE_PREFIX='newflix_cinemeta_';
+
+ function cacheKey(key){return CACHE_PREFIX+key;}
+ function readCache(key){
+  try{return JSON.parse(localStorage.getItem(cacheKey(key))||'null');}
+  catch(_){return null;}
+ }
+ function saveCache(key,items){
+  try{localStorage.setItem(cacheKey(key),JSON.stringify(items));}
+  catch(_){}
+ }
+ function render(items){
+  grid.innerHTML='';
+  const valid=(items||[]).filter(item=>item&&(item.imdb_id||item.id)&&item.poster);
+  if(!valid.length){status.textContent='Não encontrei filmes para mostrar nesta categoria.';count.textContent='0 filmes';return;}
+  valid.forEach(movie=>{
+   const imdbId=movie.imdb_id||movie.id;
+   const card=document.createElement('button');
+   card.type='button';card.className='movie-card';
+   const img=document.createElement('img');
+   img.loading='lazy';img.alt='Capa de '+(movie.name||'filme');img.src=movie.poster;
+   img.onerror=()=>{img.alt='Capa indisponível';img.style.opacity='.25';};
+   const info=document.createElement('span');info.className='movie-info';
+   const title=document.createElement('strong');title.textContent=movie.name||'Filme';
+   const date=document.createElement('small');date.textContent=movie.year||movie.releaseInfo||'Filme';
+   info.append(title,date);card.append(img,info);
+   card.addEventListener('click',()=>play(imdbId,movie.name||'Filme'));
+   grid.append(card);
+  });
+  count.textContent=valid.length+' títulos';
+  status.textContent='Toque em uma capa para abrir o player.';
+ }
+ function play(id,title){
+  if(!/^tt\d+$/i.test(String(id))){status.textContent='Este título não possui um ID IMDb válido para abrir o player.';return;}
+  document.getElementById('playerTitle').textContent='NEWFLIX · '+title;
+  frame.src='https://myembed.biz/filme/'+encodeURIComponent(id);
+  player.classList.add('open');document.body.style.overflow='hidden';
+ }
+ function closePlayer(){
+  frame.src='about:blank';player.classList.remove('open');document.body.style.overflow='';
+ }
+ async function loadCatalog(kind,query){
+  const myRequest=++requestNumber;
+  const key=(kind==='recent'?'recent':'popular')+(query?('_'+query.toLowerCase()):'');
+  const path=query
+   ? '/catalog/movie/top/search='+encodeURIComponent(query)+'.json'
+   : (kind==='recent'?'/catalog/movie/year/genre=2026.json':'/catalog/movie/top.json');
+  status.textContent='Carregando catálogo...';
+  const cached=readCache(key);
+  if(cached&&cached.length)render(cached);
+  try{
+   const response=await fetch(BASE+path,{headers:{Accept:'application/json'}});
+   if(!response.ok)throw new Error('HTTP '+response.status);
+   const data=await response.json();
+   if(myRequest!==requestNumber)return;
+   const items=data.metas||[];
+   if(items.length){saveCache(key,items);render(items);}
+   else if(!cached)status.textContent='A fonte não retornou filmes nesta categoria.';
+  }catch(error){
+   if(myRequest!==requestNumber)return;
+   if(cached&&cached.length){status.textContent='Mostrando catálogo salvo. Não foi possível atualizar agora.';}
+   else status.textContent='Não foi possível carregar o catálogo agora. Verifique a conexão e tente novamente.';
+  }
+ }
+ document.querySelectorAll('[data-feed]').forEach(button=>button.addEventListener('click',()=>{
+  feed=button.dataset.feed;
+  document.querySelectorAll('[data-feed]').forEach(item=>item.classList.toggle('active',item===button));
+  search.value='';
+  loadCatalog(feed,'');
+ }));
+ document.getElementById('searchMovies').addEventListener('click',()=>loadCatalog(feed,search.value.trim()));
+ search.addEventListener('keydown',event=>{if(event.key==='Enter'){event.preventDefault();loadCatalog(feed,search.value.trim());}});
+ document.getElementById('closePlayer').addEventListener('click',closePlayer);
+ document.addEventListener('keydown',event=>{if(event.key==='Escape'&&player.classList.contains('open'))closePlayer();});
+ loadCatalog(feed,'');
 })();
 </script>
 </body>
