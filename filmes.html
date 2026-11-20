@@ -4,111 +4,126 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="theme-color" content="#090909">
-<title>NEWFLIX — Filmes</title>
+<title>NEWFLIX — Filmes e séries</title>
 <style>
 :root{color-scheme:dark;--bg:#090909;--panel:#171717;--muted:#aaa;--red:#e50914}
 *{box-sizing:border-box}body{margin:0;background:var(--bg);color:#fff;font-family:Arial,system-ui,sans-serif}
 header{position:sticky;top:0;z-index:5;background:#101010ee;border-bottom:2px solid var(--red);padding:14px 4%;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
-.logo{font-size:25px;font-weight:900;letter-spacing:3px;color:var(--red)}
-nav{display:flex;gap:9px;flex-wrap:wrap}a,button{cursor:pointer} .btn{display:inline-block;padding:10px 15px;border:1px solid #444;border-radius:6px;background:#222;color:white;text-decoration:none;font-weight:700}.btn:hover{border-color:var(--red);background:#333}
-main{max-width:1250px;margin:auto;padding:24px 18px 60px}
-.hero{padding:30px 25px;border-radius:12px;background:linear-gradient(110deg,#300509,#171717 70%);margin-bottom:28px}
-h1{font-size:clamp(25px,5vw,42px);margin:0 0 10px}.hero p{color:#ddd;max-width:700px;line-height:1.55;margin:0 0 18px}
-h2{font-size:22px;margin:28px 0 8px}.sub{color:var(--muted);margin:0 0 16px;line-height:1.5}
-.search{display:flex;gap:8px;max-width:700px}.search input{flex:1;min-width:0;padding:13px;border-radius:7px;border:1px solid #555;background:#202020;color:white;font-size:16px}
-.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:15px}
-.card{background:var(--panel);border:1px solid #303030;border-radius:10px;overflow:hidden;display:flex;flex-direction:column;min-height:225px}
-.art{height:105px;display:grid;place-items:center;font-size:45px;background:linear-gradient(135deg,#3b080d,#181818)}
-.info{padding:15px;display:flex;flex-direction:column;align-items:flex-start;gap:9px;flex:1}.info h3{margin:0;font-size:19px}.info p{margin:0;color:#bbb;font-size:14px;line-height:1.45;flex:1}
-.tag{font-size:11px;color:#ddd;border:1px solid #555;border-radius:20px;padding:4px 8px}
-.notice{border-left:3px solid var(--red);padding:12px 15px;background:#171717;color:#ccc;line-height:1.55;margin-top:24px;font-size:14px}
-footer{text-align:center;color:#777;padding:25px;font-size:12px}
-@media(max-width:550px){header{align-items:flex-start}.logo{font-size:21px}.search{flex-direction:column}.search .btn{text-align:center}}
-
-.featured{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(260px,.9fr);gap:22px;align-items:center;background:#171717;border:1px solid #333;border-radius:12px;padding:18px;margin:18px 0 28px}
-.featured-poster{position:relative;display:block;padding:0;border:0;background:#111;border-radius:9px;overflow:hidden;color:white;width:100%;text-align:left}
-.featured-poster img{display:block;width:100%;aspect-ratio:16/9;object-fit:cover}
-.featured-poster span{position:absolute;inset:auto 0 0;padding:34px 14px 14px;background:linear-gradient(transparent,#000d);font-weight:800;font-size:18px}
-.featured-copy h3{font-size:25px;margin:10px 0}.featured-copy p{color:#bbb;line-height:1.55}
-.player-wrap{display:none;margin:18px 0 28px;background:#111;border:1px solid #333;border-radius:12px;padding:12px}
-.player-wrap.open{display:block}.player-frame{position:relative;width:100%;aspect-ratio:16/9;background:#000;border-radius:8px;overflow:hidden}
+.logo{font-size:25px;font-weight:900;letter-spacing:3px;color:var(--red)}nav{display:flex;gap:9px;flex-wrap:wrap}
+.btn{cursor:pointer;display:inline-block;padding:10px 15px;border:1px solid #444;border-radius:6px;background:#222;color:white;text-decoration:none;font-weight:700}
+.btn:hover,.btn.active{border-color:var(--red);background:#3a1114}
+main{max-width:1300px;margin:auto;padding:24px 18px 60px}
+.hero{padding:30px 25px;border-radius:12px;background:linear-gradient(110deg,#300509,#171717 70%);margin-bottom:24px}
+h1{font-size:clamp(25px,5vw,42px);margin:0 0 10px}.hero p{color:#ddd;max-width:760px;line-height:1.55;margin:0}
+.toolbar{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin:20px 0}
+.search{flex:1;min-width:210px;padding:13px;border-radius:7px;border:1px solid #555;background:#202020;color:white;font-size:16px}
+.status{color:#bbb;font-size:14px;min-height:22px;margin:10px 0}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(155px,1fr));gap:16px}
+.card{background:var(--panel);border:1px solid #303030;border-radius:9px;overflow:hidden;display:flex;flex-direction:column;min-width:0}
+.poster{width:100%;aspect-ratio:2/3;background:linear-gradient(145deg,#451016,#171717);display:grid;place-items:center;color:#777;font-size:42px;overflow:hidden}
+.poster img{width:100%;height:100%;object-fit:cover}
+.card-info{padding:11px;display:flex;flex-direction:column;gap:8px;flex:1}
+.card h3{font-size:14px;line-height:1.35;margin:0;min-height:38px}
+.meta{font-size:12px;color:#aaa}
+.watch{margin-top:auto;width:100%;text-align:center}
+.player{display:none;margin:22px 0;background:#111;border:1px solid #444;border-radius:10px;padding:12px}
+.player.open{display:block}.player-head{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:10px}
+.player-frame{position:relative;width:100%;aspect-ratio:16/9;background:#000;border-radius:8px;overflow:hidden}
 .player-frame iframe{position:absolute;inset:0;width:100%;height:100%;border:0}
-.player-actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:12px}
-@media(max-width:700px){.featured{grid-template-columns:1fr;padding:12px}.featured-copy h3{font-size:21px}}
-
+.notice{border-left:3px solid var(--red);padding:12px 15px;background:#171717;color:#bbb;line-height:1.5;margin-top:28px;font-size:13px}
+footer{text-align:center;color:#777;padding:25px;font-size:12px}
+@media(max-width:550px){header{align-items:flex-start}.logo{font-size:21px}.grid{grid-template-columns:repeat(2,minmax(0,1fr))}.hero{padding:22px 18px}}
 </style>
 </head>
 <body>
 <header><div class="logo">NEWFLIX</div><nav><a class="btn" href="index.html">📺 Canais IPTV</a></nav></header>
 <main>
 <section class="hero">
-<h1>Filmes para assistir grátis</h1>
-<p>Encontre filmes e produções disponíveis gratuitamente em plataformas oficiais. Escolha um serviço e assista pelo player da própria plataforma — sem mensalidade.</p>
-<div class="search"><input id="filmSearch" type="search" placeholder="Buscar um filme pelo nome..." aria-label="Buscar filme"><button class="btn" id="searchBtn">Buscar onde assistir</button></div>
+<h1>Filmes e séries</h1>
+<p>Catálogo atualizado com busca e reprodução no player integrado. Selecione um título para abrir o player nesta página.</p>
 </section>
-
-<h2>Em destaque — filme completo</h2>
-<p class="sub">Filme liberado gratuitamente pela própria distribuidora. Toque na capa para abrir o player aqui no NEWFLIX.</p>
-<section class="featured" aria-label="Filme em destaque">
-<button class="featured-poster" id="playLoveKills" type="button" aria-controls="loveKillsPlayer" aria-expanded="false">
-<img src="https://i.ytimg.com/vi/kfrz_DYAMg4/hqdefault.jpg" alt="Capa do filme Love Kills">
-<span>▶ Assistir Love Kills</span>
-</button>
-<div class="featured-copy">
-<span class="tag">GRÁTIS · O2 PLAY TV · 2026</span>
-<h3>Love Kills</h3>
-<p>Longa brasileiro de terror, ação e vampiros, dirigido por Luiza Shelling Tubaldini. Publicado completo e gratuitamente pela distribuidora O2 Play.</p>
-<a class="btn" href="https://www.youtube.com/@O2PlayFilmes" target="_blank" rel="noopener">Ver novos filmes da O2 Play ↗</a>
+<div class="toolbar">
+<button class="btn active" id="moviesTab" type="button">Filmes</button>
+<button class="btn" id="showsTab" type="button">Séries</button>
+<input class="search" id="search" type="search" placeholder="Buscar no catálogo carregado..." aria-label="Buscar título">
+<button class="btn" id="reload" type="button">Atualizar</button>
 </div>
+<div class="status" id="status" role="status">Carregando catálogo...</div>
+<section class="player" id="player">
+<div class="player-head"><strong id="playerTitle">Reproduzindo</strong><button class="btn" id="closePlayer" type="button">Fechar player ✕</button></div>
+<div class="player-frame"><iframe id="frame" src="about:blank" title="Player de vídeo" allow="autoplay; fullscreen; picture-in-picture; encrypted-media" allowfullscreen referrerpolicy="strict-origin-when-cross-origin"></iframe></div>
 </section>
-<section class="player-wrap" id="loveKillsPlayer" aria-label="Player Love Kills">
-<div class="player-frame"><iframe id="loveKillsFrame" title="Love Kills — filme completo no player oficial do YouTube" src="about:blank" loading="lazy" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe></div>
-<div class="player-actions"><a class="btn" href="https://www.youtube.com/watch?v=kfrz_DYAMg4" target="_blank" rel="noopener">Abrir no YouTube ↗</a><button class="btn" id="closeLoveKills" type="button">Fechar player</button></div>
-</section>
-
-<h2>Comece por aqui</h2>
-<p class="sub">Serviços gratuitos disponíveis no Brasil. Alguns exibem anúncios; outros podem pedir cadastro gratuito.</p>
-<section class="grid">
-<article class="card"><div class="art">🍿</div><div class="info"><span class="tag">GRÁTIS · SEM CONTA OBRIGATÓRIA</span><h3>Pluto TV</h3><p>Filmes sob demanda e canais ao vivo gratuitos, com anúncios.</p><a class="btn" href="https://pluto.tv/br" target="_blank" rel="noopener">Abrir Pluto TV ↗</a></div></article>
-<article class="card"><div class="art">🎞️</div><div class="info"><span class="tag">GRÁTIS · CONTA NÃO NECESSÁRIA</span><h3>Plex</h3><p>Catálogo gratuito de filmes e séries com anúncios. A disponibilidade varia.</p><a class="btn" href="https://watch.plex.tv" target="_blank" rel="noopener">Abrir Plex ↗</a></div></article>
-<article class="card"><div class="art">🎥</div><div class="info"><span class="tag">GRÁTIS · PRODUÇÕES INDEPENDENTES</span><h3>Libreflix</h3><p>Produções independentes e obras de livre exibição.</p><a class="btn" href="https://libreflix.org" target="_blank" rel="noopener">Abrir Libreflix ↗</a></div></article>
-<article class="card"><div class="art">▶️</div><div class="info"><span class="tag">GRÁTIS · SEM LOGIN PARA VÍDEOS PÚBLICOS</span><h3>YouTube — canais oficiais</h3><p>Filmes publicados legalmente por produtoras e distribuidoras oficiais.</p><a class="btn" href="https://www.youtube.com/results?search_query=filme+completo+canal+oficial" target="_blank" rel="noopener">Ver filmes oficiais ↗</a></div></article>
-<article class="card"><div class="art">🇧🇷</div><div class="info"><span class="tag">GRÁTIS · CONTA GOV.BR</span><h3>Tela Brasil</h3><p>Plataforma pública com obras audiovisuais brasileiras. Exige conta gratuita.</p><a class="btn" href="https://telabrasil.com.br" target="_blank" rel="noopener">Abrir Tela Brasil ↗</a></div></article>
-<article class="card"><div class="art">🎬</div><div class="info"><span class="tag">GRÁTIS · CINEMA BRASILEIRO</span><h3>Spcine Play</h3><p>Filmes brasileiros e conteúdos culturais; cadastro gratuito pode ser solicitado.</p><a class="btn" href="https://www.spcineplay.com.br" target="_blank" rel="noopener">Abrir Spcine Play ↗</a></div></article>
-</section>
-<div class="notice"><strong>Sobre filmes recém-lançados:</strong> lançamentos de cinema e títulos de serviços pagos normalmente não ficam disponíveis gratuitamente sem autorização. Esta página não oferece cópias não autorizadas. A busca abre resultados nos serviços oficiais; o catálogo e a disponibilidade mudam conforme cada plataforma.</div>
+<section class="grid" id="catalog" aria-live="polite"></section>
+<div class="notice"><strong>Informação:</strong> os títulos e as fontes são fornecidos por serviço externo e podem mudar ou ficar indisponíveis. Use esta integração somente para obras cuja exibição e incorporação você esteja autorizado a disponibilizar. A reprodução depende do funcionamento e das regras do provedor. O restante do aplicativo e a área IPTV não foram alterados.</div>
 </main>
-<footer>NEWFLIX Filmes · Links para plataformas oficiais. IPTV e demais áreas do aplicativo não foram alterados.</footer>
+<footer>NEWFLIX · Catálogo externo com player integrado</footer>
 <script>
 (function(){
-var input=document.getElementById('filmSearch');
-function search(){
-var q=input.value.trim();
-if(!q){input.focus();return;}
-var url='https://www.google.com/search?q='+encodeURIComponent(''+q+' assistir grátis legal Pluto TV Plex Brasil');
-window.open(url,'_blank','noopener');
+const API='https://vidsrc.sh';
+const catalog=document.getElementById('catalog');
+const status=document.getElementById('status');
+const search=document.getElementById('search');
+const frame=document.getElementById('frame');
+const player=document.getElementById('player');
+const playerTitle=document.getElementById('playerTitle');
+let kind='movie',items=[],loading=false,request=0;
+function endpoint(){return kind==='movie'?API+'/movies/latest/page-1.json':API+'/tvshows/latest/page-1.json';}
+function titleOf(x){return x.title||x.show_title||'Título sem nome';}
+function idOf(x){return x.imdb_id||x.tmdb_id;}
+function embedOf(x){return kind==='movie'?API+'/embed/movie/'+encodeURIComponent(idOf(x)):API+'/embed/tv/'+encodeURIComponent(idOf(x));}
+function closePlayer(){frame.src='about:blank';player.classList.remove('open');}
+function openPlayer(item){
+const id=idOf(item);if(!id)return;
+playerTitle.textContent=titleOf(item);
+frame.src=embedOf(item);
+player.classList.add('open');
+player.scrollIntoView({behavior:'smooth',block:'start'});
 }
-
-var playButton=document.getElementById('playLoveKills');
-var playerBox=document.getElementById('loveKillsPlayer');
-var playerFrame=document.getElementById('loveKillsFrame');
-function openLoveKills(){
-playerFrame.src='https://www.youtube-nocookie.com/embed/kfrz_DYAMg4?rel=0';
-playerBox.classList.add('open');
-playButton.setAttribute('aria-expanded','true');
-playerBox.scrollIntoView({behavior:'smooth',block:'start'});
+function render(){
+const q=search.value.trim().toLocaleLowerCase('pt-BR');
+const filtered=items.filter(x=>titleOf(x).toLocaleLowerCase('pt-BR').includes(q));
+catalog.innerHTML='';
+if(!filtered.length){status.textContent=items.length?'Nenhum título corresponde à busca.':'Nenhum título retornado pela fonte.';return;}
+status.textContent=filtered.length+' título(s) exibido(s) · '+(kind==='movie'?'Filmes':'Séries')+' recentes';
+filtered.forEach((item)=>{
+const id=idOf(item);const card=document.createElement('article');card.className='card';
+const poster=document.createElement('div');poster.className='poster';poster.textContent='🎬';
+const info=document.createElement('div');info.className='card-info';
+const h=document.createElement('h3');h.textContent=titleOf(item);
+const meta=document.createElement('div');meta.className='meta';meta.textContent=(item.quality||'Fonte externa')+(item.time_added?' · '+item.time_added.slice(0,10):'');
+const btn=document.createElement('button');btn.className='btn watch';btn.type='button';btn.textContent='▶ Assistir';btn.disabled=!id;
+btn.addEventListener('click',()=>openPlayer(item));
+info.append(h,meta,btn);card.append(poster,info);catalog.append(card);
+if(id){
+const type=kind==='movie'?'movie':'tv';
+fetch(API+'/info/'+type+'/'+encodeURIComponent(id)+'.json').then(x=>x.ok?x.json():null).then(data=>{
+if(data&&data.poster){const img=document.createElement('img');img.loading='lazy';img.alt='Pôster de '+titleOf(item);img.src=data.poster;poster.textContent='';poster.append(img);}
+if(data&&data.title)h.textContent=data.title+(data.year?' ('+data.year+')':'');
+if(data&&data.quality)meta.textContent=data.quality+(data.year?' · '+data.year:'');
+}).catch(()=>{});
 }
-function closeLoveKills(){
-playerFrame.src='about:blank';
-playerBox.classList.remove('open');
-playButton.setAttribute('aria-expanded','false');
+});
 }
-playButton.addEventListener('click',openLoveKills);
-document.getElementById('closeLoveKills').addEventListener('click',closeLoveKills);
-
-document.getElementById('searchBtn').addEventListener('click',search);
-input.addEventListener('keydown',function(e){if(e.key==='Enter')search();});
+async function load(){
+if(loading)return;loading=true;const current=++request;status.textContent='Buscando catálogo...';catalog.innerHTML='';closePlayer();
+try{
+const response=await fetch(endpoint(),{cache:'no-store'});
+if(!response.ok)throw new Error('HTTP '+response.status);
+const data=await response.json();
+if(current!==request)return;
+items=Array.isArray(data.result)?data.result:[];
+render();
+}catch(e){if(current===request){items=[];status.textContent='Não foi possível carregar o catálogo agora. Tente Atualizar mais tarde.';}}
+finally{loading=false;}
+}
+document.getElementById('moviesTab').addEventListener('click',function(){kind='movie';this.classList.add('active');document.getElementById('showsTab').classList.remove('active');load();});
+document.getElementById('showsTab').addEventListener('click',function(){kind='tv';this.classList.add('active');document.getElementById('moviesTab').classList.remove('active');load();});
+document.getElementById('reload').addEventListener('click',load);
+document.getElementById('closePlayer').addEventListener('click',closePlayer);
+search.addEventListener('input',render);
 if('serviceWorker' in navigator){navigator.serviceWorker.register('sw.js').catch(function(){});}
+load();
 })();
 </script>
-</body></html>
+</body>
+</html>
