@@ -474,7 +474,7 @@
   function nomeComparavel(nome) {
     return String(nome || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '')
       .toLowerCase()
-      .replace(/\\b(oficial|ao vivo|full hd|ultra hd|hd|fhd|sd|720p|1080p|4k)\\b/g, ' ')
+      .replace(/\b(oficial|ao vivo|full hd|ultra hd|hd|fhd|sd|720p|1080p|4k)\b/g, ' ')
       .replace(/[^a-z0-9]/g, '');
   }
 
