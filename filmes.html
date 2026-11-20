@@ -9,7 +9,7 @@
 :root{color-scheme:dark;--bg:#090909;--panel:#171717;--muted:#aaa;--red:#e50914}
 *{box-sizing:border-box}body{margin:0;background:var(--bg);color:#fff;font-family:Arial,system-ui,sans-serif}
 header{position:sticky;top:0;z-index:5;background:#101010ee;border-bottom:2px solid var(--red);padding:14px 4%;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
-.logo{font-size:25px;font-weight:900;letter-spacing:3px;color:var(--red)}nav{display:flex;gap:9px;flex-wrap:wrap}
+.logo{font-size:25px;font-weight:900;letter-spacing:3px;color:var(--red)}
 .btn{cursor:pointer;display:inline-block;padding:10px 15px;border:1px solid #444;border-radius:6px;background:#222;color:white;text-decoration:none;font-weight:700}
 .btn:hover,.btn.active{border-color:var(--red);background:#3a1114}
 main{max-width:1300px;margin:auto;padding:24px 18px 60px}
@@ -23,108 +23,82 @@ h1{font-size:clamp(25px,5vw,42px);margin:0 0 10px}.hero p{color:#ddd;max-width:7
 .poster{width:100%;aspect-ratio:2/3;background:linear-gradient(145deg,#451016,#171717);display:grid;place-items:center;color:#777;font-size:42px;overflow:hidden}
 .poster img{width:100%;height:100%;object-fit:cover}
 .card-info{padding:11px;display:flex;flex-direction:column;gap:8px;flex:1}
-.card h3{font-size:14px;line-height:1.35;margin:0;min-height:38px}
-.meta{font-size:12px;color:#aaa}
+.card h3{font-size:14px;line-height:1.35;margin:0;min-height:38px}.meta{font-size:12px;color:#aaa}
 .watch{margin-top:auto;width:100%;text-align:center}
-.player{display:none;position:fixed;inset:0;z-index:1000;background:rgba(0,0,0,.96);padding:20px;align-items:center;justify-content:center;flex-direction:column;gap:12px;overflow:auto}
-.player.open{display:flex}.player-head{display:flex;justify-content:space-between;align-items:center;gap:12px;width:min(100%,1100px);margin:0 auto}
-.player-frame{position:relative;width:min(100%,1100px);aspect-ratio:16/9;max-height:78vh;background:#000;border-radius:8px;overflow:hidden}
+.player{display:none;position:fixed;inset:0;z-index:1000;background:rgba(0,0,0,.97);padding:20px;align-items:center;justify-content:center;flex-direction:column;gap:12px}
+.player.open{display:flex}.player-head{display:flex;justify-content:space-between;align-items:center;gap:12px;width:min(100%,1100px)}
+.player-frame{position:relative;width:min(100%,1100px);aspect-ratio:16/9;max-height:78vh;background:#000;overflow:hidden}
 .player-frame iframe{position:absolute;inset:0;width:100%;height:100%;border:0}
-@media(max-width:550px){.player{padding:10px}.player-frame{max-height:70vh}.player-head{font-size:14px}}
 .notice{border-left:3px solid var(--red);padding:12px 15px;background:#171717;color:#bbb;line-height:1.5;margin-top:28px;font-size:13px}
 footer{text-align:center;color:#777;padding:25px;font-size:12px}
-@media(max-width:550px){header{align-items:flex-start}.logo{font-size:21px}.grid{grid-template-columns:repeat(2,minmax(0,1fr))}.hero{padding:22px 18px}}
+@media(max-width:550px){header{align-items:flex-start}.logo{font-size:21px}.grid{grid-template-columns:repeat(2,minmax(0,1fr))}.hero{padding:22px 18px}.player{padding:10px}.player-frame{max-height:70vh}}
 </style>
 </head>
 <body>
-<header><div class="logo">NEWFLIX</div><nav><a class="btn" href="index.html">📺 Canais IPTV</a></nav></header>
+<header><div class="logo">NEWFLIX</div><a class="btn" href="index.html">📺 Canais IPTV</a></header>
 <main>
-<section class="hero">
-<h1>Filmes e séries</h1>
-<p>Catálogo atualizado com busca e reprodução no player integrado. Selecione um título para abrir o player nesta página.</p>
-</section>
+<section class="hero"><h1>Filmes e séries</h1><p>Catálogo de obras disponibilizadas no Internet Archive, com reprodução incorporada quando o item permite.</p></section>
 <div class="toolbar">
 <button class="btn active" id="moviesTab" type="button">Filmes</button>
-<button class="btn" id="showsTab" type="button">Séries</button>
-<input class="search" id="search" type="search" placeholder="Buscar no catálogo carregado..." aria-label="Buscar título">
+<input class="search" id="search" type="search" placeholder="Buscar no catálogo..." aria-label="Buscar título">
 <button class="btn" id="reload" type="button">Atualizar</button>
 </div>
 <div class="status" id="status" role="status">Carregando catálogo...</div>
-<section class="player" id="player">
-<div class="player-head"><strong id="playerTitle">Reproduzindo</strong><button class="btn" id="closePlayer" type="button">Fechar player ✕</button></div>
-<div class="player-frame"><iframe id="frame" src="about:blank" title="Player de vídeo" allow="autoplay; fullscreen; picture-in-picture; encrypted-media" allowfullscreen referrerpolicy="strict-origin-when-cross-origin"></iframe></div>
+<section class="player" id="player" aria-modal="true" role="dialog">
+<div class="player-head"><strong id="playerTitle">Reproduzindo</strong><button class="btn" id="closePlayer" type="button">Fechar ✕</button></div>
+<div class="player-frame"><iframe id="frame" src="about:blank" title="Player do Internet Archive" allow="autoplay; fullscreen; picture-in-picture" allowfullscreen loading="lazy"></iframe></div>
 </section>
 <section class="grid" id="catalog" aria-live="polite"></section>
-<div class="notice"><strong>Informação:</strong> os títulos e as fontes são fornecidos por serviço externo e podem mudar ou ficar indisponíveis. Use esta integração somente para obras cuja exibição e incorporação você esteja autorizado a disponibilizar. A reprodução depende do funcionamento e das regras do provedor. O restante do aplicativo e a área IPTV não foram alterados.</div>
+<div class="notice"><strong>Sobre o catálogo:</strong> os resultados vêm do Internet Archive. A licença é verificada pelos metadados disponíveis antes de exibir o botão Assistir. O idioma cadastrado no acervo não confirma, por si só, que o áudio seja dublado em português. Cada obra mantém seus próprios termos de uso. A área IPTV não foi alterada.</div>
 </main>
-<footer>NEWFLIX · Catálogo externo com player integrado</footer>
+<footer>NEWFLIX · Catálogo do Internet Archive</footer>
 <script>
 (function(){
-const API='https://vidsrc.sh';
-const catalog=document.getElementById('catalog');
-const status=document.getElementById('status');
-const search=document.getElementById('search');
-const frame=document.getElementById('frame');
-const player=document.getElementById('player');
-const playerTitle=document.getElementById('playerTitle');
-let kind='movie',items=[],loading=false,request=0;
-function endpoint(){return kind==='movie'?API+'/movies/latest/page-1.json':API+'/tvshows/latest/page-1.json';}
-function titleOf(x){return x.title||x.show_title||'Título sem nome';}
-function idOf(x){return x.imdb_id||x.tmdb_id;}
-function embedOf(x){return kind==='movie'?API+'/embed/movie/'+encodeURIComponent(idOf(x)):API+'/embed/tv/'+encodeURIComponent(idOf(x));}
+const API='https://archive.org/advancedsearch.php';
+const catalog=document.getElementById('catalog'),status=document.getElementById('status'),search=document.getElementById('search');
+const frame=document.getElementById('frame'),player=document.getElementById('player'),playerTitle=document.getElementById('playerTitle');
+let items=[],loading=false;
+function permitted(x){
+ const l=String(x.licenseurl||'').toLowerCase();
+ return l.includes('creativecommons.org/publicdomain')||l.includes('creativecommons.org/licenses/by/')||l.includes('creativecommons.org/licenses/by-sa/');
+}
 function closePlayer(){frame.src='about:blank';player.classList.remove('open');document.body.style.overflow='';}
-function openPlayer(item){
-const id=idOf(item);if(!id)return;
-playerTitle.textContent=titleOf(item);
-frame.src=embedOf(item);
-player.classList.add('open');
-document.body.style.overflow='hidden';
-}
+function openPlayer(x){playerTitle.textContent=x.title||'Filme';frame.src='https://archive.org/embed/'+encodeURIComponent(x.identifier);player.classList.add('open');document.body.style.overflow='hidden';}
 function render(){
-const q=search.value.trim().toLocaleLowerCase('pt-BR');
-const filtered=items.filter(x=>titleOf(x).toLocaleLowerCase('pt-BR').includes(q));
-catalog.innerHTML='';
-if(!filtered.length){status.textContent=items.length?'Nenhum título corresponde à busca.':'Nenhum título retornado pela fonte.';return;}
-status.textContent=filtered.length+' título(s) exibido(s) · '+(kind==='movie'?'Filmes':'Séries')+' recentes';
-filtered.forEach((item)=>{
-const id=idOf(item);const card=document.createElement('article');card.className='card';
-const poster=document.createElement('div');poster.className='poster';poster.textContent='🎬';
-const info=document.createElement('div');info.className='card-info';
-const h=document.createElement('h3');h.textContent=titleOf(item);
-const meta=document.createElement('div');meta.className='meta';meta.textContent=(item.quality||'Fonte externa')+(item.time_added?' · '+item.time_added.slice(0,10):'');
-const btn=document.createElement('button');btn.className='btn watch';btn.type='button';btn.textContent='▶ Assistir';btn.disabled=!id;
-btn.addEventListener('click',()=>openPlayer(item));
-info.append(h,meta,btn);card.append(poster,info);catalog.append(card);
-if(id){
-const type=kind==='movie'?'movie':'tv';
-fetch(API+'/info/'+type+'/'+encodeURIComponent(id)+'.json').then(x=>x.ok?x.json():null).then(data=>{
-if(data&&data.poster){const img=document.createElement('img');img.loading='lazy';img.alt='Pôster de '+titleOf(item);img.src=data.poster;poster.textContent='';poster.append(img);}
-if(data&&data.title)h.textContent=data.title+(data.year?' ('+data.year+')':'');
-if(data&&data.quality)meta.textContent=data.quality+(data.year?' · '+data.year:'');
-}).catch(()=>{});
-}
-});
+ const q=search.value.trim().toLocaleLowerCase('pt-BR');
+ const filtered=items.filter(x=>(x.title||'').toLocaleLowerCase('pt-BR').includes(q));
+ catalog.innerHTML='';
+ if(!filtered.length){status.textContent=items.length?'Nenhum título corresponde à busca.':'Nenhum item com licença aberta identificável foi encontrado nesta consulta.';return;}
+ status.textContent=filtered.length+' título(s) exibido(s) · resultados com licença aberta identificável';
+ filtered.forEach(x=>{
+  const card=document.createElement('article');card.className='card';
+  const poster=document.createElement('div');poster.className='poster';poster.textContent='🎬';
+  if(x.identifier){const img=document.createElement('img');img.loading='lazy';img.alt='Capa de '+(x.title||'filme');img.src='https://archive.org/services/img/'+encodeURIComponent(x.identifier);img.onerror=()=>img.remove();poster.textContent='';poster.append(img);}
+  const info=document.createElement('div');info.className='card-info';
+  const h=document.createElement('h3');h.textContent=x.title||'Título sem nome';
+  const meta=document.createElement('div');meta.className='meta';meta.textContent=[x.year,x.language].filter(Boolean).join(' · ')||'Metadados do acervo';
+  const btn=document.createElement('button');btn.className='btn watch';btn.type='button';btn.textContent='▶ Assistir';btn.addEventListener('click',()=>openPlayer(x));
+  info.append(h,meta,btn);card.append(poster,info);catalog.append(card);
+ });
 }
 async function load(){
-if(loading)return;loading=true;const current=++request;status.textContent='Buscando catálogo...';catalog.innerHTML='';closePlayer();
-try{
-const response=await fetch(endpoint(),{cache:'no-store'});
-if(!response.ok)throw new Error('HTTP '+response.status);
-const data=await response.json();
-if(current!==request)return;
-items=Array.isArray(data.result)?data.result:[];
-render();
-}catch(e){if(current===request){items=[];status.textContent='Não foi possível carregar o catálogo agora. Tente Atualizar mais tarde.';}}
-finally{loading=false;}
+ if(loading)return;loading=true;status.textContent='Buscando obras no Internet Archive...';catalog.innerHTML='';closePlayer();
+ try{
+  const params=new URLSearchParams({q:'mediatype:movies AND (licenseurl:"https://creativecommons.org/licenses/by/4.0/" OR licenseurl:"https://creativecommons.org/licenses/by-sa/4.0/" OR licenseurl:"https://creativecommons.org/publicdomain/zero/1.0/")', 'fl[]':'identifier,title,year,description,licenseurl,language','rows':'100','page':'1','output':'json','sort[]':'downloads desc'});
+  const response=await fetch(API+'?'+params.toString(),{headers:{'Accept':'application/json'}});
+  if(!response.ok)throw new Error('HTTP '+response.status);
+  const data=await response.json();
+  items=(data.response&&Array.isArray(data.response.docs)?data.response.docs:[]).filter(x=>x.identifier&&permitted(x));
+  render();
+  if(!items.length)status.textContent='A busca não retornou itens com licença aberta identificável. Tente Atualizar mais tarde.';
+ }catch(e){items=[];status.textContent='Não foi possível consultar o Internet Archive agora. Tente novamente mais tarde.';}
+ finally{loading=false;}
 }
-document.getElementById('moviesTab').addEventListener('click',function(){kind='movie';this.classList.add('active');document.getElementById('showsTab').classList.remove('active');load();});
-document.getElementById('showsTab').addEventListener('click',function(){kind='tv';this.classList.add('active');document.getElementById('moviesTab').classList.remove('active');load();});
 document.getElementById('reload').addEventListener('click',load);
 document.getElementById('closePlayer').addEventListener('click',closePlayer);
-document.addEventListener('keydown',function(event){if(event.key==='Escape'&&player.classList.contains('open'))closePlayer();});
-player.addEventListener('click',function(event){if(event.target===player)closePlayer();});
+document.addEventListener('keydown',e=>{if(e.key==='Escape'&&player.classList.contains('open'))closePlayer();});
+player.addEventListener('click',e=>{if(e.target===player)closePlayer();});
 search.addEventListener('input',render);
-if('serviceWorker' in navigator){navigator.serviceWorker.register('sw.js').catch(function(){});}
 load();
 })();
 </script>
