@@ -26,10 +26,11 @@ h1{font-size:clamp(25px,5vw,42px);margin:0 0 10px}.hero p{color:#ddd;max-width:7
 .card h3{font-size:14px;line-height:1.35;margin:0;min-height:38px}
 .meta{font-size:12px;color:#aaa}
 .watch{margin-top:auto;width:100%;text-align:center}
-.player{display:none;margin:22px 0;background:#111;border:1px solid #444;border-radius:10px;padding:12px}
-.player.open{display:block}.player-head{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:10px}
-.player-frame{position:relative;width:100%;aspect-ratio:16/9;background:#000;border-radius:8px;overflow:hidden}
+.player{display:none;position:fixed;inset:0;z-index:1000;background:rgba(0,0,0,.96);padding:20px;align-items:center;justify-content:center;flex-direction:column;gap:12px;overflow:auto}
+.player.open{display:flex}.player-head{display:flex;justify-content:space-between;align-items:center;gap:12px;width:min(100%,1100px);margin:0 auto}
+.player-frame{position:relative;width:min(100%,1100px);aspect-ratio:16/9;max-height:78vh;background:#000;border-radius:8px;overflow:hidden}
 .player-frame iframe{position:absolute;inset:0;width:100%;height:100%;border:0}
+@media(max-width:550px){.player{padding:10px}.player-frame{max-height:70vh}.player-head{font-size:14px}}
 .notice{border-left:3px solid var(--red);padding:12px 15px;background:#171717;color:#bbb;line-height:1.5;margin-top:28px;font-size:13px}
 footer{text-align:center;color:#777;padding:25px;font-size:12px}
 @media(max-width:550px){header{align-items:flex-start}.logo{font-size:21px}.grid{grid-template-columns:repeat(2,minmax(0,1fr))}.hero{padding:22px 18px}}
@@ -71,13 +72,13 @@ function endpoint(){return kind==='movie'?API+'/movies/latest/page-1.json':API+'
 function titleOf(x){return x.title||x.show_title||'Título sem nome';}
 function idOf(x){return x.imdb_id||x.tmdb_id;}
 function embedOf(x){return kind==='movie'?API+'/embed/movie/'+encodeURIComponent(idOf(x)):API+'/embed/tv/'+encodeURIComponent(idOf(x));}
-function closePlayer(){frame.src='about:blank';player.classList.remove('open');}
+function closePlayer(){frame.src='about:blank';player.classList.remove('open');document.body.style.overflow='';}
 function openPlayer(item){
 const id=idOf(item);if(!id)return;
 playerTitle.textContent=titleOf(item);
 frame.src=embedOf(item);
 player.classList.add('open');
-player.scrollIntoView({behavior:'smooth',block:'start'});
+document.body.style.overflow='hidden';
 }
 function render(){
 const q=search.value.trim().toLocaleLowerCase('pt-BR');
@@ -120,6 +121,8 @@ document.getElementById('moviesTab').addEventListener('click',function(){kind='m
 document.getElementById('showsTab').addEventListener('click',function(){kind='tv';this.classList.add('active');document.getElementById('moviesTab').classList.remove('active');load();});
 document.getElementById('reload').addEventListener('click',load);
 document.getElementById('closePlayer').addEventListener('click',closePlayer);
+document.addEventListener('keydown',function(event){if(event.key==='Escape'&&player.classList.contains('open'))closePlayer();});
+player.addEventListener('click',function(event){if(event.target===player)closePlayer();});
 search.addEventListener('input',render);
 if('serviceWorker' in navigator){navigator.serviceWorker.register('sw.js').catch(function(){});}
 load();
